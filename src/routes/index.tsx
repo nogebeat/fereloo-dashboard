@@ -4,17 +4,17 @@ import { LandingPage } from '@/components/landing-page';
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [
-      { title: 'Fereloo — Provisioning-as-a-Service' },
+      { title: 'Fereloo — Le CRM des PME africaines' },
       {
         name: 'description',
         content:
-          'Déployez vos tenants applicatifs multi-tenant en moins de 90 secondes. Base de données, sous-domaines TLS et monitoring automatisés.',
+          "Centralisez vos clients, suivez vos ventes et alignez votre équipe commerciale. Sans Excel, sans technicien, facturé en FCFA.",
       },
-      { property: 'og:title', content: 'Fereloo — Provisioning-as-a-Service' },
+      { property: 'og:title', content: 'Fereloo — Le CRM des PME africaines' },
       {
         property: 'og:description',
         content:
-          'Plateforme SaaS de provisionnement automatisé : MariaDB, sous-domaines, TLS, monitoring temps réel.',
+          "Plus de clients, moins de chaos. Le CRM pensé pour les dirigeants et équipes commerciales en Afrique.",
       },
     ],
   }),
