@@ -140,9 +140,7 @@ export function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="absolute inset-0 bg-cyber-grid opacity-20" />
-      <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
+    <div className="relative min-h-screen bg-background text-foreground">
 
       {/* Header */}
       <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-6">
@@ -175,9 +173,7 @@ export function LandingPage() {
         <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
           Plus de clients.
           <br />
-          <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Moins de chaos.
-          </span>
+          <span className="text-primary">Moins de chaos.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
           Centralisez vos clients, suivez vos ventes et alignez votre équipe commerciale —
@@ -370,7 +366,7 @@ export function LandingPage() {
 
       {/* Final CTA */}
       <section className="relative z-10 mx-auto max-w-4xl px-4 pb-20 md:px-6">
-        <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card/60 to-card/60 p-8 text-center backdrop-blur md:p-12">
+        <div className="rounded-xl border border-border bg-card p-8 text-center md:p-12">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
             Prêt à structurer votre commercial ?
           </h2>
