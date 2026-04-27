@@ -9,11 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProvisionRouteImport } from './routes/provision'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TenantsNewRouteImport } from './routes/tenants.new'
-import { Route as TenantsTenantIdRouteImport } from './routes/tenants.$tenantId'
+import { Route as StatusTenantIdRouteImport } from './routes/status.$tenantId'
 
+const ProvisionRoute = ProvisionRouteImport.update({
+  id: '/provision',
+  path: '/provision',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -24,53 +29,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TenantsNewRoute = TenantsNewRouteImport.update({
-  id: '/tenants/new',
-  path: '/tenants/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TenantsTenantIdRoute = TenantsTenantIdRouteImport.update({
-  id: '/tenants/$tenantId',
-  path: '/tenants/$tenantId',
+const StatusTenantIdRoute = StatusTenantIdRouteImport.update({
+  id: '/status/$tenantId',
+  path: '/status/$tenantId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
-  '/tenants/new': typeof TenantsNewRoute
+  '/provision': typeof ProvisionRoute
+  '/status/$tenantId': typeof StatusTenantIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
-  '/tenants/new': typeof TenantsNewRoute
+  '/provision': typeof ProvisionRoute
+  '/status/$tenantId': typeof StatusTenantIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
-  '/tenants/new': typeof TenantsNewRoute
+  '/provision': typeof ProvisionRoute
+  '/status/$tenantId': typeof StatusTenantIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/tenants/$tenantId' | '/tenants/new'
+  fullPaths: '/' | '/dashboard' | '/provision' | '/status/$tenantId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/tenants/$tenantId' | '/tenants/new'
-  id: '__root__' | '/' | '/dashboard' | '/tenants/$tenantId' | '/tenants/new'
+  to: '/' | '/dashboard' | '/provision' | '/status/$tenantId'
+  id: '__root__' | '/' | '/dashboard' | '/provision' | '/status/$tenantId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
-  TenantsTenantIdRoute: typeof TenantsTenantIdRoute
-  TenantsNewRoute: typeof TenantsNewRoute
+  ProvisionRoute: typeof ProvisionRoute
+  StatusTenantIdRoute: typeof StatusTenantIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/provision': {
+      id: '/provision'
+      path: '/provision'
+      fullPath: '/provision'
+      preLoaderRoute: typeof ProvisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -85,18 +92,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tenants/new': {
-      id: '/tenants/new'
-      path: '/tenants/new'
-      fullPath: '/tenants/new'
-      preLoaderRoute: typeof TenantsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tenants/$tenantId': {
-      id: '/tenants/$tenantId'
-      path: '/tenants/$tenantId'
-      fullPath: '/tenants/$tenantId'
-      preLoaderRoute: typeof TenantsTenantIdRouteImport
+    '/status/$tenantId': {
+      id: '/status/$tenantId'
+      path: '/status/$tenantId'
+      fullPath: '/status/$tenantId'
+      preLoaderRoute: typeof StatusTenantIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,8 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
-  TenantsTenantIdRoute: TenantsTenantIdRoute,
-  TenantsNewRoute: TenantsNewRoute,
+  ProvisionRoute: ProvisionRoute,
+  StatusTenantIdRoute: StatusTenantIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Fereloo design system — dark mode default, electric cyan accents
- * Style: clean tech / operational / cyber
+ * Fereloo design system — Frappe CRM provisioning for African SaaS.
+ * Dark mode default with warm amber/orange accents.
  */
 
 @theme inline {
@@ -44,62 +44,62 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* Default = dark mode (cyber/operational palette) */
+/* Default = dark mode (warm amber/orange accents on deep slate) */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.16 0.02 250);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.20 0.02 250);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.20 0.02 250);
-  --popover-foreground: oklch(0.96 0.005 250);
-  /* Electric cyan primary */
-  --primary: oklch(0.78 0.16 210);
-  --primary-foreground: oklch(0.16 0.02 250);
-  --secondary: oklch(0.26 0.02 250);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.24 0.02 250);
-  --muted-foreground: oklch(0.65 0.02 250);
-  --accent: oklch(0.30 0.04 220);
-  --accent-foreground: oklch(0.96 0.005 250);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0.005 250);
-  --success: oklch(0.72 0.18 155);
-  --success-foreground: oklch(0.16 0.02 250);
-  --warning: oklch(0.80 0.15 80);
-  --warning-foreground: oklch(0.16 0.02 250);
-  --border: oklch(0.30 0.02 250);
-  --input: oklch(0.26 0.02 250);
-  --ring: oklch(0.78 0.16 210);
-  --cyber-glow: oklch(0.78 0.16 210 / 0.35);
-  --cyber-grid: oklch(0.30 0.02 250 / 0.5);
+  --background: oklch(0.17 0.012 60);
+  --foreground: oklch(0.97 0.005 80);
+  --card: oklch(0.21 0.014 60);
+  --card-foreground: oklch(0.97 0.005 80);
+  --popover: oklch(0.21 0.014 60);
+  --popover-foreground: oklch(0.97 0.005 80);
+  /* Warm amber primary (African SaaS feel) */
+  --primary: oklch(0.78 0.17 60);
+  --primary-foreground: oklch(0.17 0.012 60);
+  --secondary: oklch(0.27 0.015 60);
+  --secondary-foreground: oklch(0.97 0.005 80);
+  --muted: oklch(0.25 0.012 60);
+  --muted-foreground: oklch(0.66 0.015 70);
+  --accent: oklch(0.32 0.04 55);
+  --accent-foreground: oklch(0.97 0.005 80);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --success: oklch(0.72 0.17 155);
+  --success-foreground: oklch(0.17 0.012 60);
+  --warning: oklch(0.82 0.15 85);
+  --warning-foreground: oklch(0.17 0.012 60);
+  --border: oklch(0.30 0.015 60);
+  --input: oklch(0.27 0.015 60);
+  --ring: oklch(0.78 0.17 60);
+  --cyber-glow: oklch(0.78 0.17 60 / 0.35);
+  --cyber-grid: oklch(0.30 0.015 60 / 0.5);
 }
 
 /* Optional explicit .dark class — same as :root */
 .dark {
-  --background: oklch(0.16 0.02 250);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.20 0.02 250);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.20 0.02 250);
-  --popover-foreground: oklch(0.96 0.005 250);
-  --primary: oklch(0.78 0.16 210);
-  --primary-foreground: oklch(0.16 0.02 250);
-  --secondary: oklch(0.26 0.02 250);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.24 0.02 250);
-  --muted-foreground: oklch(0.65 0.02 250);
-  --accent: oklch(0.30 0.04 220);
-  --accent-foreground: oklch(0.96 0.005 250);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0.005 250);
-  --success: oklch(0.72 0.18 155);
-  --success-foreground: oklch(0.16 0.02 250);
-  --warning: oklch(0.80 0.15 80);
-  --warning-foreground: oklch(0.16 0.02 250);
-  --border: oklch(0.30 0.02 250);
-  --input: oklch(0.26 0.02 250);
-  --ring: oklch(0.78 0.16 210);
+  --background: oklch(0.17 0.012 60);
+  --foreground: oklch(0.97 0.005 80);
+  --card: oklch(0.21 0.014 60);
+  --card-foreground: oklch(0.97 0.005 80);
+  --popover: oklch(0.21 0.014 60);
+  --popover-foreground: oklch(0.97 0.005 80);
+  --primary: oklch(0.78 0.17 60);
+  --primary-foreground: oklch(0.17 0.012 60);
+  --secondary: oklch(0.27 0.015 60);
+  --secondary-foreground: oklch(0.97 0.005 80);
+  --muted: oklch(0.25 0.012 60);
+  --muted-foreground: oklch(0.66 0.015 70);
+  --accent: oklch(0.32 0.04 55);
+  --accent-foreground: oklch(0.97 0.005 80);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --success: oklch(0.72 0.17 155);
+  --success-foreground: oklch(0.17 0.012 60);
+  --warning: oklch(0.82 0.15 85);
+  --warning-foreground: oklch(0.17 0.012 60);
+  --border: oklch(0.30 0.015 60);
+  --input: oklch(0.27 0.015 60);
+  --ring: oklch(0.78 0.17 60);
 }
 
 @layer base {
