@@ -81,12 +81,12 @@ export const PLANS: Plan[] = [
     storageGb: 100,
     highlighted: true,
     features: [
-      '20 utilisateurs',
-      '100 Go de stockage',
-      'Domaine personnalisé',
-      'Backups horaires',
-      'Intégrations (WhatsApp, SMS, Wave)',
-      'Support prioritaire 24/5',
+      "Jusqu'à 20 commerciaux",
+      'Votre propre nom de domaine',
+      'Sauvegardes toutes les heures',
+      'Relances WhatsApp & SMS automatiques',
+      'Encaissements Wave & Mobile Money',
+      'Support prioritaire 6j/7',
     ],
   },
   {
