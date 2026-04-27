@@ -1,36 +1,22 @@
-import { createFileRoute, useLocation } from '@tanstack/react-router';
-import { useAuth } from '@/lib/use-auth';
-import { LoginPage } from '@/components/login-page';
+import { createFileRoute } from '@tanstack/react-router';
 import { LandingPage } from '@/components/landing-page';
-import { AppLayout } from '@/components/app-layout';
-import { DashboardView } from '@/components/dashboard-view';
 
 export const Route = createFileRoute('/')({
-  component: IndexPage,
+  head: () => ({
+    meta: [
+      { title: 'Fereloo — Provisioning-as-a-Service' },
+      {
+        name: 'description',
+        content:
+          'Déployez vos tenants applicatifs multi-tenant en moins de 90 secondes. Base de données, sous-domaines TLS et monitoring automatisés.',
+      },
+      { property: 'og:title', content: 'Fereloo — Provisioning-as-a-Service' },
+      {
+        property: 'og:description',
+        content:
+          'Plateforme SaaS de provisionnement automatisé : MariaDB, sous-domaines, TLS, monitoring temps réel.',
+      },
+    ],
+  }),
+  component: LandingPage,
 });
-
-function IndexPage() {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-  const showLogin = location.hash === 'login';
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return (
-      <AppLayout>
-        <DashboardView />
-      </AppLayout>
-    );
-  }
-
-  if (showLogin) return <LoginPage />;
-
-  return <LandingPage />;
-}

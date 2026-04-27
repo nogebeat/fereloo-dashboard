@@ -1,81 +1,82 @@
-export type AssetCondition = 'excellent' | 'good' | 'fair' | 'poor' | 'retired';
+export type TenantStatus = 'provisioning' | 'active' | 'failed' | 'suspended';
+export type PlanId = 'basic' | 'pro' | 'enterprise';
 
-export interface AssetCategory {
-  id: string;
+export interface Plan {
+  id: PlanId;
   name: string;
-  default_useful_life_years: number;
-  created_at: string;
+  priceFcfa: number;
+  period: string;
+  features: string[];
+  highlighted?: boolean;
 }
 
-export interface Employee {
+export interface Tenant {
   id: string;
-  name: string;
-  department: string | null;
-  email: string | null;
-  created_at: string;
+  subdomain: string;
+  status: TenantStatus;
+  plan: PlanId;
+  createdAt: string;
+  url: string;
+  region: string;
 }
 
-export interface Asset {
+export interface ProvisioningLog {
   id: string;
-  name: string;
-  category_id: string | null;
-  serial_number: string | null;
-  purchase_date: string;
-  purchase_cost: number;
-  condition: AssetCondition;
-  location: string | null;
-  notes: string | null;
-  useful_life_years: number;
-  residual_value_percent: number;
-  is_archived: boolean;
-  created_by: string | null;
-  created_at: string;
-  updated_at: string;
-  asset_categories?: AssetCategory | null;
+  timestamp: string;
+  level: 'info' | 'success' | 'error' | 'warn';
+  message: string;
 }
 
-export interface AssetAssignment {
-  id: string;
-  asset_id: string;
-  employee_id: string;
-  assigned_date: string;
-  returned_date: string | null;
-  notes: string | null;
-  created_at: string;
-  employees?: Employee | null;
+export interface ProvisioningProgress {
+  tenantId: string;
+  status: TenantStatus;
+  progress: number; // 0-100
+  currentStep: string;
+  logs: ProvisioningLog[];
 }
 
-export const CONDITION_LABELS: Record<AssetCondition, string> = {
-  excellent: 'Excellent',
-  good: 'Good',
-  fair: 'Fair',
-  poor: 'Poor',
-  retired: 'Retired',
-};
-
-export const CONDITION_COLORS: Record<AssetCondition, string> = {
-  excellent: 'bg-success text-success-foreground',
-  good: 'bg-primary text-primary-foreground',
-  fair: 'bg-warning text-warning-foreground',
-  poor: 'bg-destructive text-destructive-foreground',
-  retired: 'bg-muted text-muted-foreground',
-};
-
-export function calculateDepreciation(purchaseCost: number, purchaseDate: string, usefulLifeYears: number, residualPercent: number = 0) {
-  const now = new Date();
-  const purchase = new Date(purchaseDate);
-  const totalDays = usefulLifeYears * 365.25;
-  const daysSince = Math.max(0, (now.getTime() - purchase.getTime()) / (1000 * 60 * 60 * 24));
-  const residualValue = purchaseCost * (residualPercent / 100);
-  const depreciableAmount = purchaseCost - residualValue;
-  const depreciationFraction = Math.min(1, daysSince / totalDays);
-  const currentValue = Math.max(residualValue, purchaseCost - depreciableAmount * depreciationFraction);
-  const totalDepreciation = purchaseCost - currentValue;
-
-  return {
-    currentValue: Math.round(currentValue * 100) / 100,
-    totalDepreciation: Math.round(totalDepreciation * 100) / 100,
-    percentDepreciated: Math.round(depreciationFraction * 100),
-    isFullyDepreciated: depreciationFraction >= 1,
-  };
-}
+export const PLANS: Plan[] = [
+  {
+    id: 'basic',
+    name: 'Basic',
+    priceFcfa: 15000,
+    period: '/mois',
+    features: [
+      '1 instance MariaDB',
+      '5 GB de stockage',
+      '10 000 requêtes / mois',
+      'Sous-domaine fereloo.com',
+      'Support email',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    priceFcfa: 45000,
+    period: '/mois',
+    highlighted: true,
+    features: [
+      '3 instances MariaDB',
+      '50 GB de stockage',
+      '500 000 requêtes / mois',
+      'Domaine personnalisé',
+      'Backups automatiques',
+      'Support prioritaire 24/5',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    priceFcfa: 150000,
+    period: '/mois',
+    features: [
+      'Instances illimitées',
+      '500 GB de stockage',
+      'Requêtes illimitées',
+      'SLA 99.95%',
+      'Région dédiée',
+      'Support 24/7 + CSM',
+      'SSO & audit logs',
+    ],
+  },
+];

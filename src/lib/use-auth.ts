@@ -1,46 +1,60 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import type { Session, User } from '@supabase/supabase-js';
+/**
+ * Mock auth — to be replaced with @clerk/react when keys are available.
+ * Persists session in localStorage.
+ */
+import { useEffect, useState } from 'react';
+
+interface MockUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+const STORAGE_KEY = 'fereloo:mock-auth';
+
+function readUser(): MockUser | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as MockUser) : null;
+  } catch {
+    return null;
+  }
+}
 
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<MockUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    setUser(readUser());
+    setLoading(false);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    const onStorage = () => setUser(readUser());
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('fereloo:auth-changed', onStorage);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('fereloo:auth-changed', onStorage);
+    };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-  };
-
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signIn = (email: string) => {
+    const u: MockUser = {
+      id: 'usr_' + Math.random().toString(36).slice(2, 10),
       email,
-      password,
-      options: { emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined },
-    });
-    if (error) throw error;
+      name: email.split('@')[0],
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+    window.dispatchEvent(new Event('fereloo:auth-changed'));
+    setUser(u);
   };
 
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+  const signOut = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new Event('fereloo:auth-changed'));
+    setUser(null);
   };
 
-  return { session, user, loading, signIn, signUp, signOut };
+  return { user, loading, signIn, signOut };
 }
