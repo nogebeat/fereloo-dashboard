@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               >
                 <span className="inline-flex items-center gap-2">
                   <LayoutDashboard className="h-4 w-4" />
-                  Tenants
+                  Tableau de bord
                 </span>
               </Link>
             </nav>
@@ -38,11 +38,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              onClick={() => navigate({ to: '/tenants/new' })}
+              onClick={() => navigate({ to: '/provision' })}
               className="hidden sm:inline-flex"
             >
               <Plus className="h-4 w-4" />
-              Nouveau tenant
+              Nouvelle instance
             </Button>
             {user && (
               <div className="flex items-center gap-2">
