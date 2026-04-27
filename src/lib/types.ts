@@ -64,12 +64,12 @@ export const PLANS: Plan[] = [
     users: 5,
     storageGb: 10,
     features: [
-      '5 utilisateurs',
-      '10 Go de stockage',
-      'Frappe CRM complet',
-      'Sous-domaine .fereloo.com',
-      'Backups quotidiens',
-      'Support email',
+      "Jusqu'à 5 commerciaux",
+      'Suivi clients & opportunités',
+      'Tableau de bord des ventes',
+      'Adresse web dédiée à votre entreprise',
+      'Sauvegardes automatiques quotidiennes',
+      'Support par email',
     ],
   },
   {
