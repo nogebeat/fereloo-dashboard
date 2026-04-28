@@ -1,8 +1,13 @@
 import { Outlet, Link, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ClerkProvider, useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Zap } from "lucide-react";
+import { useEffect } from "react";
+import { setTokenGetter } from "@/lib/api";
 import appCss from "../styles.css?url";
+
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string;
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -53,7 +58,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap",
       },
     ],
   }),
@@ -69,17 +74,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+          {children}
+        </ClerkProvider>
         <Scripts />
       </body>
     </html>
   );
 }
 
+function TokenSync() {
+  const { getToken } = useClerkAuth();
+  useEffect(() => {
+    setTokenGetter(getToken);
+  }, [getToken]);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <TokenSync />
       <Outlet />
       <Toaster />
     </QueryClientProvider>

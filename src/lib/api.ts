@@ -1,15 +1,9 @@
 /**
- * Mock Fereloo API — simulates the FastAPI backend that orchestrates
- * Frappe CRM provisioning (mariadb -> redis -> app -> domain).
+ * Fereloo API client — calls the FastAPI backend.
  *
- * Drop-in migration to the real backend:
- *   - Replace each function with `fetch(import.meta.env.VITE_API_URL + ...)`.
- *   - Attach `Authorization: Bearer ${await clerk.session.getToken()}`.
- *   - Keep the same return shapes (Tenant, TenantStatusResponse).
- *
- * Mock state lives in localStorage so reloads don't lose tenants.
- * Provisioning is driven by elapsed wall-clock time per tenant (no setInterval),
- * so polling at any cadence converges to the same steps + logs.
+ * Auth: Clerk JWT, injected via setTokenGetter() called at app startup.
+ * All functions return the same shapes as the former mock (Tenant, TenantStatusResponse, …)
+ * so no route code had to change.
  */
 import {
   PROVISIONING_STEP_DEFS,
@@ -21,108 +15,147 @@ import {
   type TenantStatusResponse,
 } from './types';
 
-const STORAGE_KEY = 'fereloo:tenants';
-const PROV_KEY = 'fereloo:prov';
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000';
 
-/** ms duration per step in the mock (kept short for demo). */
-const STEP_DURATION_MS: Record<string, number> = {
-  mariadb: 4000,
-  redis: 3000,
-  app: 6000,
-  domain: 4000,
-};
-const TOTAL_DURATION_MS = Object.values(STEP_DURATION_MS).reduce((a, b) => a + b, 0);
+// ── Token plumbing ──────────────────────────────────────────────────────────
 
-interface ProvState {
-  startedAt: number; // epoch ms
-  /** Optional forced failure on a specific step, for demo. */
-  failOn?: keyof typeof STEP_DURATION_MS;
+let _getToken: (() => Promise<string | null>) | null = null;
+
+export function setTokenGetter(fn: () => Promise<string | null>) {
+  _getToken = fn;
 }
 
-const SEED_TENANTS: Tenant[] = [
-  {
-    id: 'tnt_demo01',
-    subdomain: 'kossam-cosmetics',
-    status: 'active',
-    plan: 'pro',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),
-    url: 'https://kossam-cosmetics.fereloo.com',
-    region: 'af-west-1',
-  },
-];
+async function _token(): Promise<string | null> {
+  return _getToken ? _getToken() : null;
+}
 
-function load(): Tenant[] {
-  if (typeof window === 'undefined') return SEED_TENANTS;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_TENANTS));
-      return SEED_TENANTS;
-    }
-    return JSON.parse(raw) as Tenant[];
-  } catch {
-    return SEED_TENANTS;
+// ── HTTP helpers ────────────────────────────────────────────────────────────
+
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = await _token();
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(init?.headers ?? {}),
+    },
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`${res.status} ${res.statusText}: ${body}`);
+  }
+  // 204 No Content
+  if (res.status === 204) return undefined as T;
+  return res.json() as Promise<T>;
+}
+
+const apiGet  = <T>(path: string) => apiFetch<T>(path, { method: 'GET' });
+const apiPost = <T>(path: string, body: unknown) =>
+  apiFetch<T>(path, { method: 'POST', body: JSON.stringify(body) });
+
+// ── Backend response types (raw) ────────────────────────────────────────────
+
+interface RawTenant {
+  id: string;
+  subdomain: string;
+  status: string;
+  plan: string;
+  createdAt: string;
+  url: string;
+  region: string;
+}
+
+interface RawStep {
+  step: string;
+  status: string; // in_progress | done | error | pending
+  message: string | null;
+  created_at: string | null;
+}
+
+interface RawProvisioningStatus {
+  tenant_id: string;
+  status: string;
+  progress: number;
+  current_step: string | null;
+  steps: RawStep[];
+}
+
+// ── Shape adapters ──────────────────────────────────────────────────────────
+
+function rawToTenant(r: RawTenant): Tenant {
+  return {
+    id: r.id,
+    subdomain: r.subdomain,
+    status: r.status as Tenant['status'],
+    plan: r.plan as PlanId,
+    createdAt: r.createdAt,
+    url: r.url,
+    region: r.region,
+  };
+}
+
+function backendStatusToStep(rawStatus: string): ProvisioningStepStatus {
+  switch (rawStatus) {
+    case 'in_progress': return 'running';
+    case 'done':        return 'success';
+    case 'error':       return 'failed';
+    default:            return 'pending';
   }
 }
 
-function save(tenants: Tenant[]) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tenants));
+function mapLogLevel(rawStatus: string): ProvisioningLog['level'] {
+  switch (rawStatus) {
+    case 'done':        return 'success';
+    case 'error':       return 'error';
+    case 'in_progress': return 'info';
+    default:            return 'info';
   }
 }
 
-function loadProv(): Record<string, ProvState> {
-  if (typeof window === 'undefined') return {};
-  try {
-    return JSON.parse(localStorage.getItem(PROV_KEY) ?? '{}');
-  } catch {
-    return {};
-  }
-}
-
-function saveProv(state: Record<string, ProvState>) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(PROV_KEY, JSON.stringify(state));
-  }
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/* ------------------------------------------------------------------ */
-/* Tenants                                                             */
-/* ------------------------------------------------------------------ */
+// ── Public API ──────────────────────────────────────────────────────────────
 
 export async function listTenants(): Promise<Tenant[]> {
-  await sleep(350);
-  return load().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const raw = await apiGet<RawTenant[]>('/tenants');
+  return raw.map(rawToTenant);
 }
 
 export async function getCurrentTenant(): Promise<Tenant | null> {
-  // Backend would use the Clerk JWT to find "the user's tenant".
-  // Mock: returns the most recent tenant, if any.
-  await sleep(250);
-  const all = load().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return all[0] ?? null;
+  const raw = await apiGet<RawTenant | null>('/tenants/current');
+  return raw ? rawToTenant(raw) : null;
 }
 
 export async function getTenant(id: string): Promise<Tenant | null> {
-  await sleep(200);
-  return load().find((t) => t.id === id) ?? null;
+  try {
+    const raw = await apiGet<RawTenant>(`/tenants/${id}`);
+    return rawToTenant(raw);
+  } catch {
+    return null;
+  }
 }
 
 export async function checkSubdomainAvailable(subdomain: string): Promise<boolean> {
-  await sleep(300);
-  return !load().some((t) => t.subdomain.toLowerCase() === subdomain.toLowerCase());
+  const data = await apiGet<{ available: boolean }>(
+    `/tenants/subdomain-check?subdomain=${encodeURIComponent(subdomain)}`,
+  );
+  return data.available;
 }
 
 export async function provisionTenant(input: {
   subdomain: string;
   plan: PlanId;
   region?: string;
+  adminPassword: string;
 }): Promise<Tenant> {
-  await sleep(500);
-  const tenant: Tenant = {
-    id: 'tnt_' + Math.random().toString(36).slice(2, 10),
+  const raw = await apiPost<RawProvisioningStatus>('/tenants/provision', {
+    subdomain: input.subdomain,
+    plan_id: input.plan,
+    region: input.region ?? 'af-west-1',
+    admin_password: input.adminPassword,
+  });
+  // The provision endpoint returns a ProvisioningStatusResponse; reconstruct a minimal Tenant.
+  return {
+    id: raw.tenant_id,
     subdomain: input.subdomain,
     status: 'provisioning',
     plan: input.plan,
@@ -130,173 +163,47 @@ export async function provisionTenant(input: {
     url: `https://${input.subdomain}.fereloo.com`,
     region: input.region ?? 'af-west-1',
   };
-  const all = load();
-  all.unshift(tenant);
-  save(all);
-  // Mark provisioning start so subsequent polls compute progress from now.
-  const prov = loadProv();
-  prov[tenant.id] = { startedAt: Date.now() };
-  saveProv(prov);
-  return tenant;
 }
 
-export async function deleteTenant(id: string): Promise<void> {
-  await sleep(250);
-  save(load().filter((t) => t.id !== id));
-  const prov = loadProv();
-  delete prov[id];
-  saveProv(prov);
+export async function deleteTenant(_id: string): Promise<void> {
+  // Not yet exposed by the backend — no-op for now.
 }
 
-/* ------------------------------------------------------------------ */
-/* Provisioning status (polled)                                        */
-/* ------------------------------------------------------------------ */
-
-/** Per-step log scripts surfaced as wall-clock-driven entries. */
-const STEP_LOGS: Record<string, Array<{ atRatio: number; level: ProvisioningLog['level']; message: string }>> = {
-  mariadb: [
-    { atRatio: 0.05, level: 'info', message: '[mariadb] Provisionnement de l\'instance MariaDB 11.4' },
-    { atRatio: 0.45, level: 'info', message: '[mariadb] Création de l\'utilisateur applicatif et du schéma' },
-    { atRatio: 0.95, level: 'success', message: '[mariadb] Instance prête sur 3306 ✓' },
-  ],
-  redis: [
-    { atRatio: 0.10, level: 'info', message: '[redis] Démarrage de l\'instance Redis 7' },
-    { atRatio: 0.85, level: 'success', message: '[redis] Connexion validée ✓' },
-  ],
-  app: [
-    { atRatio: 0.05, level: 'info', message: '[frappe] Pull de l\'image frappe-crm:latest' },
-    { atRatio: 0.30, level: 'info', message: '[frappe] bench new-site avec credentials générés' },
-    { atRatio: 0.55, level: 'info', message: '[frappe] bench install-app crm' },
-    { atRatio: 0.80, level: 'info', message: '[frappe] bench migrate' },
-    { atRatio: 0.95, level: 'success', message: '[frappe] Application prête, pods 2/2 ready ✓' },
-  ],
-  domain: [
-    { atRatio: 0.10, level: 'info', message: '[domain] Création du record DNS' },
-    { atRatio: 0.50, level: 'info', message: '[domain] Configuration TLS via cert-manager' },
-    { atRatio: 0.90, level: 'success', message: '[domain] Certificat délivré, ingress actif ✓' },
-  ],
-};
-
-function computeStepsAtElapsed(elapsedMs: number): {
-  steps: ProvisioningStep[];
-  progress: number;
-  done: boolean;
-} {
-  let cursor = 0;
-  const steps: ProvisioningStep[] = PROVISIONING_STEP_DEFS.map((def) => {
-    const dur = STEP_DURATION_MS[def.key];
-    const start = cursor;
-    const end = cursor + dur;
-    cursor = end;
-    let status: ProvisioningStepStatus = 'pending';
-    if (elapsedMs >= end) status = 'success';
-    else if (elapsedMs >= start) status = 'running';
-    return { ...def, status };
-  });
-  const progress = Math.min(100, Math.round((elapsedMs / TOTAL_DURATION_MS) * 100));
-  return { steps, progress, done: elapsedMs >= TOTAL_DURATION_MS };
-}
-
-function computeLogsAtElapsed(elapsedMs: number, tenantId: string): ProvisioningLog[] {
-  const logs: ProvisioningLog[] = [
-    {
-      id: `${tenantId}-init`,
-      timestamp: new Date(Date.now() - elapsedMs).toISOString(),
-      level: 'info',
-      message: '[init] Réception de la demande de provisioning',
-    },
-  ];
-  let cursor = 0;
-  for (const def of PROVISIONING_STEP_DEFS) {
-    const dur = STEP_DURATION_MS[def.key];
-    const start = cursor;
-    cursor += dur;
-    for (const entry of STEP_LOGS[def.key]) {
-      const at = start + entry.atRatio * dur;
-      if (elapsedMs >= at) {
-        logs.push({
-          id: `${tenantId}-${def.key}-${entry.atRatio}`,
-          timestamp: new Date(Date.now() - (elapsedMs - at)).toISOString(),
-          level: entry.level,
-          message: entry.message,
-        });
-      }
-    }
-  }
-  if (elapsedMs >= TOTAL_DURATION_MS) {
-    logs.push({
-      id: `${tenantId}-done`,
-      timestamp: new Date().toISOString(),
-      level: 'success',
-      message: '[done] Tenant prêt et accessible',
-    });
-  }
-  return logs;
-}
-
-/**
- * Polled status endpoint. Mirrors `GET /tenants/{tenant_id}/status`.
- * Calling this repeatedly returns increasing progress until completion,
- * at which point it flips the tenant to `active` in storage.
- */
 export async function getTenantStatus(tenantId: string): Promise<TenantStatusResponse | null> {
-  await sleep(180);
-  const tenant = load().find((t) => t.id === tenantId);
-  if (!tenant) return null;
+  try {
+    const [tenant, statusData] = await Promise.all([
+      getTenant(tenantId),
+      apiGet<RawProvisioningStatus>(`/tenants/${tenantId}/status`),
+    ]);
 
-  // Already-final states return a fully-resolved snapshot.
-  if (tenant.status === 'active') {
-    const finalSteps: ProvisioningStep[] = PROVISIONING_STEP_DEFS.map((d) => ({
-      ...d,
-      status: 'success',
-    }));
-    return {
-      tenant,
-      progress: 100,
-      steps: finalSteps,
-      logs: computeLogsAtElapsed(TOTAL_DURATION_MS, tenant.id),
-    };
-  }
-  if (tenant.status === 'failed') {
-    const failedSteps: ProvisioningStep[] = PROVISIONING_STEP_DEFS.map((d, i) => ({
-      ...d,
-      status: i === 0 ? 'success' : i === 1 ? 'failed' : 'pending',
-    }));
-    return {
-      tenant,
-      progress: 25,
-      steps: failedSteps,
-      logs: [],
-      errorMessage: 'Échec lors du provisioning Redis. Réessayez.',
-    };
-  }
+    if (!tenant) return null;
 
-  // Provisioning in progress — compute from elapsed time.
-  const prov = loadProv();
-  let state = prov[tenantId];
-  if (!state) {
-    state = { startedAt: Date.now() };
-    prov[tenantId] = state;
-    saveProv(prov);
-  }
-  const elapsed = Date.now() - state.startedAt;
-  const { steps, progress, done } = computeStepsAtElapsed(elapsed);
-  const logs = computeLogsAtElapsed(elapsed, tenantId);
-
-  if (done) {
-    const all = load();
-    const idx = all.findIndex((t) => t.id === tenantId);
-    if (idx >= 0) {
-      all[idx] = { ...all[idx], status: 'active' };
-      save(all);
+    // Build the per-step status by walking all log rows and keeping the last known status.
+    const stepLastStatus = new Map<string, string>();
+    for (const l of statusData.steps) {
+      stepLastStatus.set(l.step, l.status);
     }
-    return {
-      tenant: { ...tenant, status: 'active' },
-      progress: 100,
-      steps: steps.map((s) => ({ ...s, status: 'success' })),
-      logs,
-    };
-  }
 
-  return { tenant, progress, steps, logs };
+    const steps: ProvisioningStep[] = PROVISIONING_STEP_DEFS.map((def) => ({
+      ...def,
+      status: backendStatusToStep(stepLastStatus.get(def.key) ?? 'pending'),
+    }));
+
+    // Use every log row as a console entry.
+    const logs: ProvisioningLog[] = statusData.steps.map((l, i) => ({
+      id: `${tenantId}-${l.step}-${i}`,
+      timestamp: l.created_at ?? new Date().toISOString(),
+      level: mapLogLevel(l.status),
+      message: l.message ?? `[${l.step}] ${l.status}`,
+    }));
+
+    const errorMessage =
+      statusData.status === 'failed'
+        ? 'Le déploiement a échoué — consultez les logs pour le détail.'
+        : undefined;
+
+    return { tenant, progress: statusData.progress, steps, logs, errorMessage };
+  } catch {
+    return null;
+  }
 }

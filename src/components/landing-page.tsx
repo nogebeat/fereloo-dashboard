@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import {
   ArrowRight,
   Check,
@@ -13,9 +12,12 @@ import {
   Store,
   Briefcase,
   Truck,
+  Menu,
+  X,
+  Zap,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Accordion,
   AccordionContent,
@@ -25,6 +27,7 @@ import {
 import { useAuth } from '@/lib/use-auth';
 import { PLANS } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import dashboardDemo from '@/assets/dashboard-demo.jpg';
 
 const BENEFITS = [
   {
@@ -66,7 +69,7 @@ const USE_CASES = [
     title: 'Fidélisez vos clients réguliers',
     desc: "Suivez les habitudes d'achat, déclenchez des relances ciblées par WhatsApp, mesurez ce qui rapporte vraiment.",
     bullets: [
-      'Historique client complet en un coup d\'œil',
+      "Historique client complet en un coup d'œil",
       'Campagnes WhatsApp & SMS automatisées',
       'Tableau des ventes par boutique',
     ],
@@ -79,7 +82,7 @@ const USE_CASES = [
     bullets: [
       'Pipeline visuel par étape de vente',
       'Devis & factures intégrés',
-      'Prévisionnel de chiffre d\'affaires',
+      "Prévisionnel de chiffre d'affaires",
     ],
   },
   {
@@ -105,7 +108,7 @@ const FAQ = [
     a: "Oui. Vos données sont hébergées en Afrique, chiffrées, et sauvegardées automatiquement. Vous restez propriétaire de toutes vos informations et pouvez les exporter à tout moment.",
   },
   {
-    q: 'Faut-il être technicien pour l\'utiliser ?',
+    q: "Faut-il être technicien pour l'utiliser ?",
     a: "Non, c'est conçu pour les équipes commerciales et les dirigeants, pas pour des informaticiens. L'interface est en français et la prise en main se fait en moins d'une heure.",
   },
   {
@@ -122,137 +125,268 @@ const FAQ = [
   },
 ];
 
+const NAV_LINKS = [
+  { href: '#benefices', label: 'Bénéfices' },
+  { href: '#cas-usage', label: "Cas d'usage" },
+  { href: '#tarifs', label: 'Tarifs' },
+  { href: '#faq', label: 'FAQ' },
+];
+
 export function LandingPage() {
   const { signIn } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed || !/^\S+@\S+\.\S+$/.test(trimmed)) {
-      setError('Email invalide');
-      return;
-    }
-    signIn(trimmed);
-    navigate({ to: '/dashboard' });
-  };
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
 
-      {/* Header */}
-      <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-6">
+      {/* Dot grid atmospheric background */}
+      <div
+        className="bg-dot-grid pointer-events-none fixed inset-0 z-0 opacity-60"
+        aria-hidden
+      />
+
+      {/* Violet radial glow, top-center */}
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[480px]"
+        style={{
+          background:
+            'radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.55 0.22 295 / 0.12) 0%, transparent 70%)',
+        }}
+        aria-hidden
+      />
+
+      {/* ── HEADER ── */}
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
-            F
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <Zap className="h-4 w-4" strokeWidth={2.5} />
           </span>
-          <span className="text-lg font-semibold tracking-tight">Fereloo</span>
+          <span className="font-display text-lg font-bold tracking-tight">Fereloo</span>
         </div>
+
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-          <a href="#benefices" className="transition hover:text-foreground">Bénéfices</a>
-          <a href="#cas-usage" className="transition hover:text-foreground">Cas d'usage</a>
-          <a href="#tarifs" className="transition hover:text-foreground">Tarifs</a>
-          <a href="#faq" className="transition hover:text-foreground">FAQ</a>
+          {NAV_LINKS.map((l) => (
+            <a key={l.href} href={l.href} className="transition hover:text-foreground">
+              {l.label}
+            </a>
+          ))}
         </nav>
-        <a
-          href="#commencer"
-          className="rounded-md border border-border bg-card/50 px-3 py-1.5 text-sm text-foreground transition hover:border-primary/40"
-        >
-          Commencer
-        </a>
+
+        <div className="flex items-center gap-2">
+          <a
+            href="#commencer"
+            className="hidden rounded-md border border-border bg-card/50 px-3 py-1.5 text-sm text-foreground transition hover:border-primary/40 md:block"
+          >
+            Commencer
+          </a>
+          <button
+            className="flex items-center justify-center rounded-md border border-border bg-card/50 p-2 md:hidden"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative z-10 mx-auto max-w-5xl px-4 pb-12 pt-12 text-center md:px-6 md:pt-20">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-xs uppercase tracking-wider text-primary">
-          <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-primary" />
-          Le CRM des PME africaines
+      {/* Mobile nav drawer */}
+      {mobileOpen && (
+        <div className="relative z-20 border-b border-border bg-background/96 px-4 pb-4 backdrop-blur md:hidden">
+          <nav className="flex flex-col gap-0.5">
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-md px-3 py-2.5 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
+              >
+                {l.label}
+              </a>
+            ))}
+            <a
+              href="#commencer"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 rounded-md bg-primary px-3 py-2.5 text-center text-sm font-medium text-primary-foreground"
+            >
+              Commencer gratuitement
+            </a>
+          </nav>
         </div>
-        <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
-          Plus de clients.
-          <br />
-          <span className="text-primary">Moins de chaos.</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-          Centralisez vos clients, suivez vos ventes et alignez votre équipe commerciale —
-          sans Excel, sans technicien, et facturé en FCFA.
-        </p>
+      )}
 
-        <form
-          id="commencer"
-          onSubmit={handleSubmit}
-          className="mx-auto mt-10 flex max-w-md flex-col gap-2 sm:flex-row"
-        >
-          <Input
-            type="email"
-            placeholder="vous@votre-entreprise.africa"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError(null);
-            }}
-            className="h-11 bg-card/70 backdrop-blur"
-          />
-          <Button type="submit" size="lg" className="h-11 glow-primary">
-            Démarrer gratuitement
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </form>
-        {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
-        <p className="mt-3 text-xs text-muted-foreground">
-          Essai sans carte bancaire · Configuration en quelques minutes
-        </p>
+      {/* ── HERO ── */}
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-8 md:px-6 md:pb-16 md:pt-14">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-14 xl:gap-20">
+
+          {/* Left: copy */}
+          <div className="flex-1 lg:max-w-[52%]">
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-xs uppercase tracking-wider text-primary">
+              <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-primary" />
+              Le CRM des PME africaines
+            </div>
+
+            <h1 className="animate-fade-up animation-delay-100 mt-5 font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-[68px]">
+              Plus de clients.
+              <br />
+              <span className="text-primary">Moins de chaos.</span>
+            </h1>
+
+            <p className="animate-fade-up animation-delay-200 mt-5 max-w-lg text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+              Centralisez vos clients, suivez vos ventes et alignez votre équipe commerciale —
+              sans Excel, sans technicien, facturé en FCFA.
+            </p>
+
+            <div
+              id="commencer"
+              className="animate-fade-up animation-delay-300 mt-8 flex max-w-md flex-col gap-2 sm:flex-row"
+            >
+              <Button
+                size="lg"
+                className="h-11 glow-primary shrink-0"
+                onClick={() => signIn()}
+              >
+                Démarrer gratuitement
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="animate-fade-up animation-delay-400 mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-success" /> Sans carte bancaire
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-success" /> Prêt en 90 secondes
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-success" /> Facturé en FCFA
+              </span>
+            </div>
+          </div>
+
+          {/* Right: dashboard preview */}
+          <div className="animate-fade-up animation-delay-200 relative flex-1 lg:max-w-[48%]">
+            {/* Browser chrome frame */}
+            <div className="relative overflow-hidden rounded-xl border border-white/8 shadow-[0_32px_80px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.05)]">
+              <div className="flex items-center gap-1.5 border-b border-white/8 bg-[oklch(0.20_0_0)] px-3 py-2.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/70" />
+                <div className="ml-2 flex-1 rounded-md bg-white/5 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+                  app.fereloo.com/dashboard
+                </div>
+              </div>
+              <img
+                src={dashboardDemo}
+                alt="Aperçu du tableau de bord Fereloo"
+                className="w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Floating stat — bottom left */}
+            <div className="absolute -bottom-3 -left-3 hidden rounded-lg border border-border bg-card/95 px-3.5 py-2.5 shadow-xl backdrop-blur-md md:flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-success/15 text-success">
+                <TrendingUp className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="font-display text-sm font-bold leading-tight">+34%</p>
+                <p className="font-mono text-[10px] text-muted-foreground">de conversions</p>
+              </div>
+            </div>
+
+            {/* Floating stat — top right */}
+            <div className="absolute -right-3 top-10 hidden rounded-lg border border-border bg-card/95 px-3.5 py-2.5 shadow-xl backdrop-blur-md md:flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary">
+                <BarChart3 className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="font-display text-sm font-bold leading-tight">Wave ✓</p>
+                <p className="font-mono text-[10px] text-muted-foreground">paiement intégré</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </section>
 
-      {/* Bénéfices */}
+      {/* ── TRUST BAR ── */}
+      <section className="relative z-10 border-y border-border/50 bg-card/20 py-4 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/70">
+            {[
+              'Commerce & Retail',
+              'Services & Conseil',
+              'Distribution B2B',
+              'Immobilier',
+              'Logistique',
+              'Agroalimentaire',
+            ].map((sector, i, arr) => (
+              <span key={sector} className="flex items-center gap-7">
+                <span>{sector}</span>
+                {i < arr.length - 1 && (
+                  <span className="text-border/60" aria-hidden>·</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BÉNÉFICES ── */}
       <section
         id="benefices"
-        className="relative z-10 mx-auto max-w-6xl px-4 pb-16 md:px-6 md:pb-24"
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-16 pt-16 md:px-6 md:pb-24"
       >
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            Ce que Fereloo change pour votre entreprise
+        <div className="mb-10">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Pourquoi Fereloo</p>
+          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+            Ce que Fereloo change
+            <br className="hidden md:block" /> pour votre entreprise
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-3 max-w-xl text-sm text-muted-foreground">
             Concret, mesurable, dès la première semaine.
           </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {BENEFITS.map((b) => (
+
+        <div className="grid gap-px border border-border rounded-xl overflow-hidden bg-border md:grid-cols-2 lg:grid-cols-3">
+          {BENEFITS.map((b, i) => (
             <div
               key={b.title}
-              className="group rounded-xl border border-border bg-card/60 p-6 backdrop-blur transition hover:border-primary/40"
+              className={cn(
+                'group bg-card p-6 transition hover:bg-accent/30',
+                i === 0 && 'lg:col-span-1',
+              )}
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary/20">
                 <b.icon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 text-base font-semibold">{b.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{b.desc}</p>
+              <h3 className="mt-4 font-display text-base font-bold">{b.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Cas d'usage */}
+      {/* ── CAS D'USAGE ── */}
       <section
         id="cas-usage"
         className="relative z-10 mx-auto max-w-6xl px-4 pb-16 md:px-6 md:pb-24"
       >
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+        <div className="mb-10">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Secteurs</p>
+          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
             Adapté à votre métier
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-3 max-w-xl text-sm text-muted-foreground">
             Trois exemples parmi des dizaines de secteurs déjà accompagnés.
           </p>
         </div>
+
         <div className="grid gap-4 md:grid-cols-3">
           {USE_CASES.map((u) => (
             <div
               key={u.title}
-              className="flex flex-col rounded-xl border border-border bg-card/60 p-6 backdrop-blur transition hover:border-primary/40"
+              className="flex flex-col rounded-xl border border-border bg-card/60 p-6 transition hover:border-primary/40"
             >
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -262,9 +396,9 @@ export function LandingPage() {
                   {u.sector}
                 </span>
               </div>
-              <h3 className="mt-4 text-lg font-semibold">{u.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{u.desc}</p>
-              <ul className="mt-5 flex-1 space-y-2 text-sm">
+              <h3 className="mt-4 font-display text-lg font-bold">{u.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{u.desc}</p>
+              <ul className="mt-5 flex-1 space-y-2.5 text-sm">
                 {u.bullets.map((b) => (
                   <li key={b} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -277,25 +411,27 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Tarifs */}
+      {/* ── TARIFS ── */}
       <section
         id="tarifs"
         className="relative z-10 mx-auto max-w-6xl px-4 pb-16 md:px-6 md:pb-24"
       >
         <div className="mb-10 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Tarifs</p>
+          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
             Des tarifs simples, en FCFA
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-3 text-sm text-muted-foreground">
             Sans engagement. Vous changez de formule quand vous voulez.
           </p>
         </div>
+
         <div className="grid gap-4 md:grid-cols-3">
           {PLANS.map((p) => (
             <div
               key={p.id}
               className={cn(
-                'relative flex flex-col rounded-xl border bg-card/70 p-6 backdrop-blur transition',
+                'relative flex flex-col rounded-xl border bg-card/70 p-6 transition',
                 p.highlighted
                   ? 'border-primary glow-primary'
                   : 'border-border hover:border-primary/40',
@@ -307,16 +443,16 @@ export function LandingPage() {
                   Le plus choisi
                 </span>
               )}
-              <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                 {p.name}
               </div>
               <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-3xl font-semibold tracking-tight">
+                <span className="font-display text-3xl font-bold tracking-tight">
                   {p.priceFcfa.toLocaleString('fr-FR')}
                 </span>
                 <span className="text-sm text-muted-foreground">FCFA{p.period}</span>
               </div>
-              <ul className="mt-5 flex-1 space-y-2 text-sm">
+              <ul className="mt-5 flex-1 space-y-2.5 text-sm">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -336,17 +472,22 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ── FAQ ── */}
       <section
         id="faq"
         className="relative z-10 mx-auto max-w-3xl px-4 pb-16 md:px-6 md:pb-24"
       >
         <div className="mb-10 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">FAQ</p>
+          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
             Questions fréquentes
           </h2>
         </div>
-        <Accordion type="single" collapsible className="rounded-xl border border-border bg-card/60 backdrop-blur">
+        <Accordion
+          type="single"
+          collapsible
+          className="rounded-xl border border-border bg-card/60"
+        >
           {FAQ.map((item, i) => (
             <AccordionItem
               key={item.q}
@@ -356,7 +497,7 @@ export function LandingPage() {
               <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">
                 {item.q}
               </AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground">
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
                 {item.a}
               </AccordionContent>
             </AccordionItem>
@@ -364,35 +505,50 @@ export function LandingPage() {
         </Accordion>
       </section>
 
-      {/* Final CTA */}
+      {/* ── FINAL CTA ── */}
       <section className="relative z-10 mx-auto max-w-4xl px-4 pb-20 md:px-6">
-        <div className="rounded-xl border border-border bg-card p-8 text-center md:p-12">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+        <div className="relative overflow-hidden rounded-xl border border-primary/25 bg-card p-8 text-center md:p-12">
+          {/* Subtle radial behind the card */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 60% 80% at 50% 100%, oklch(0.55 0.22 295 / 0.08) 0%, transparent 70%)',
+            }}
+            aria-hidden
+          />
+          <p className="relative font-mono text-[11px] uppercase tracking-wider text-primary">
             Prêt à structurer votre commercial ?
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
-            Rejoignez les PME africaines qui ont arrêté de perdre leurs clients dans Excel.
           </p>
-          <Button asChild size="lg" className="mt-6 h-11 glow-primary">
+          <h2 className="relative mt-3 font-display text-2xl font-bold tracking-tight md:text-3xl">
+            Rejoignez les PME africaines
+            <br className="hidden md:block" /> qui ont arrêté de perdre leurs clients dans Excel.
+          </h2>
+          <p className="relative mx-auto mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
+            Configuration en quelques minutes. Aucune carte bancaire requise.
+          </p>
+          <Button asChild size="lg" className="relative mt-6 h-11 glow-primary">
             <a href="#commencer">
               Démarrer gratuitement
               <ArrowRight className="h-4 w-4" />
             </a>
           </Button>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Sans carte bancaire · Sans engagement
+          <p className="relative mt-3 text-xs text-muted-foreground">
+            Sans carte bancaire · Sans engagement · Made in Africa
           </p>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── FOOTER ── */}
       <footer className="relative z-10 border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground md:flex-row md:px-6">
           <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-primary-foreground text-[10px] font-bold">
-              F
+            <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-primary-foreground">
+              <Zap className="h-3 w-3" strokeWidth={2.5} />
             </span>
-            <span>© {new Date().getFullYear()} Fereloo · Made in Africa</span>
+            <span className="font-display font-bold">Fereloo</span>
+            <span className="text-border/60">·</span>
+            <span>© {new Date().getFullYear()} · Made in Africa</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="#" className="transition hover:text-foreground">Confidentialité</a>
@@ -401,6 +557,7 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

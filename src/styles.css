@@ -6,7 +6,7 @@
 /*
  * Fereloo design system — Frappe CRM-inspired.
  * Dark, minimal, functional. Violet primary on near-black surfaces.
- * No gradients, no glow effects on chrome — accents only where meaningful.
+ * Display: Syne (700/800) · Body: DM Sans · Mono: JetBrains Mono
  */
 
 @theme inline {
@@ -39,7 +39,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Syne', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
@@ -140,11 +141,36 @@
 }
 
 /*
- * Legacy utility names kept as no-ops so existing components don't break.
- * The Frappe-inspired aesthetic does not use grid backgrounds or glows.
+ * Landing-specific backgrounds
  */
 .bg-cyber-grid { background-image: none; }
-.glow-primary { box-shadow: none; }
+
+.bg-dot-grid {
+  background-image: radial-gradient(oklch(0.36 0 0) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Violet glow — used on primary CTAs and highlighted cards */
+.glow-primary {
+  box-shadow:
+    0 0 0 1px oklch(0.55 0.22 295 / 0.22),
+    0 4px 24px oklch(0.55 0.22 295 / 0.18),
+    0 1px 3px oklch(0 0 0 / 0.4);
+}
+
+/* Hero entrance stagger */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
 
 /* Subtle pulse for live indicators (dot only, no glow halo) */
 @keyframes pulse-glow {

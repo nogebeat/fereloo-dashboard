@@ -58,6 +58,7 @@ function ProvisionForm() {
   const queryClient = useQueryClient();
   const [subdomain, setSubdomain] = useState('');
   const [plan, setPlan] = useState<PlanId>('pro');
+  const [adminPassword, setAdminPassword] = useState('');
   const [check, setCheck] = useState<SubdomainCheck>('idle');
 
   useEffect(() => {
@@ -78,7 +79,7 @@ function ProvisionForm() {
   }, [subdomain]);
 
   const provision = useMutation({
-    mutationFn: () => provisionTenant({ subdomain, plan }),
+    mutationFn: () => provisionTenant({ subdomain, plan, adminPassword }),
     onSuccess: (tenant) => {
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
       queryClient.invalidateQueries({ queryKey: ['current-tenant'] });
@@ -86,7 +87,7 @@ function ProvisionForm() {
     },
   });
 
-  const canSubmit = check === 'available' && !provision.isPending;
+  const canSubmit = check === 'available' && adminPassword.length >= 8 && !provision.isPending;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -129,6 +130,24 @@ function ProvisionForm() {
           <p className="font-mono text-[11px] text-muted-foreground">
             Lettres minuscules, chiffres, tirets. Doit commencer et finir par un caractère
             alphanumérique. 3 à 30 caractères.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="admin-password" className="font-mono text-[11px] uppercase tracking-wider">
+            Mot de passe administrateur CRM
+          </Label>
+          <Input
+            id="admin-password"
+            type="password"
+            value={adminPassword}
+            onChange={(e) => setAdminPassword(e.target.value)}
+            placeholder="Min. 8 caractères"
+            className="h-11 font-mono"
+            disabled={provision.isPending}
+          />
+          <p className="font-mono text-[11px] text-muted-foreground">
+            Ce mot de passe sera celui du compte admin de votre instance Frappe CRM.
           </p>
         </div>
 
