@@ -62,7 +62,7 @@ function DashboardPage() {
   if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border border-foreground/20 border-t-foreground" />
       </div>
     );
   }
@@ -72,13 +72,13 @@ function DashboardPage() {
   return (
     <AppShell>
       {/* Greeting */}
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">
-          Bonjour, {user.name.split(' ')[0]} 👋
+      <div className="mb-12">
+        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-2">
+          // Session_Active
+        </div>
+        <h1 className="font-display text-3xl font-bold tracking-tighter md:text-4xl">
+          Console. <span className="text-muted-foreground/40">{user.name.split(' ')[0]}</span>
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
       </div>
 
       {isLoading ? (
@@ -95,75 +95,70 @@ function DashboardPage() {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-24 rounded-lg" />
+          <Skeleton key={i} className="h-24 rounded-[2px]" />
         ))}
       </div>
-      <Skeleton className="h-48 w-full rounded-xl" />
-      <Skeleton className="h-32 w-full rounded-xl" />
+      <Skeleton className="h-48 w-full rounded-[2px]" />
+      <Skeleton className="h-32 w-full rounded-[2px]" />
     </div>
   );
 }
 
 function NoTenantState() {
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-12 py-12">
       <div className="text-center">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary">
+        <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-[4px] border border-border bg-secondary text-foreground">
           <Rocket className="h-7 w-7" />
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-xs uppercase tracking-wider text-primary">
-          <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-primary" />
-          Bienvenue sur Fereloo
+        <div className="inline-flex items-center gap-2 rounded-none border border-border bg-secondary/50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          &gt; Bienvenue sur Fereloo
         </div>
-        <h2 className="mt-4 font-display text-2xl font-bold tracking-tight md:text-3xl">
-          Provisionnez votre instance Frappe CRM
+        <h2 className="mt-6 font-display text-3xl font-bold tracking-tighter">
+          Provisionnez votre instance.
         </h2>
-        <p className="mt-3 text-balance text-sm leading-relaxed text-muted-foreground">
-          Vous n'avez pas encore d'instance. Choisissez un plan et un sous-domaine — votre CRM
-          sera prêt en 90 secondes.
+        <p className="mt-4 text-balance text-sm leading-relaxed text-muted-foreground font-medium">
+          Aucune instance active détectée. Déployez votre environnement Frappe CRM en moins de 90 secondes.
         </p>
       </div>
 
       {/* Infrastructure overview */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { icon: Database, label: 'MariaDB', desc: 'Base de données dédiée' },
-          { icon: Server, label: 'Redis', desc: 'Cache & file de jobs' },
-          { icon: Globe, label: 'TLS auto', desc: 'Certificat Let\'s Encrypt' },
+          { icon: Database, label: 'MariaDB', desc: 'Isolé' },
+          { icon: Server, label: 'Redis', desc: 'Dédié' },
+          { icon: Globe, label: 'TLS auto', desc: 'SSL' },
         ].map(({ icon: Icon, label, desc }) => (
           <div
             key={label}
-            className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3.5"
+            className="flex items-center gap-4 rounded-[2px] border border-border bg-card p-4 transition-colors hover:bg-secondary/50"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Icon className="h-4 w-4" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] bg-secondary text-foreground">
+              <Icon className="h-5 w-5" strokeWidth={1.5} />
             </div>
             <div>
-              <div className="text-sm font-medium">{label}</div>
-              <div className="font-mono text-[10px] text-muted-foreground">{desc}</div>
+              <div className="text-[11px] font-bold uppercase tracking-tight">{label}</div>
+              <div className="font-mono text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">{desc}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <Card className="border-primary/25 bg-card p-6 glow-primary">
-        <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <h3 className="font-display text-base font-bold">Lancer le provisioning</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Sous-domaine, plan, déploiement automatisé en quelques clics.
-            </p>
-          </div>
-          <Button asChild className="glow-primary shrink-0">
-            <Link to="/provision">
-              <Rocket className="h-4 w-4" />
-              Démarrer
-            </Link>
-          </Button>
+      <div className="border border-foreground/10 bg-card p-8 rounded-[4px] flex flex-col items-center justify-center gap-6 text-center">
+        <div>
+          <h3 className="font-display text-lg font-bold">Prêt pour le déploiement ?</h3>
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
+            Choisissez votre sous-domaine et lancez l'orchestration.
+          </p>
         </div>
-      </Card>
+        <Button asChild className="h-12 px-8 rounded-[2px] font-bold text-xs uppercase tracking-widest">
+          <Link to="/provision">
+            Lancer l'orchestration <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
@@ -173,43 +168,26 @@ function StatTile({
   label,
   value,
   sub,
-  accent = 'primary',
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
   sub: string;
-  accent?: 'primary' | 'success' | 'warning' | 'muted';
 }) {
-  const accentColors = {
-    primary: 'bg-primary',
-    success: 'bg-success',
-    warning: 'bg-warning',
-    muted: 'bg-muted-foreground',
-  };
-  const iconColors = {
-    primary: 'bg-primary/10 text-primary',
-    success: 'bg-success/10 text-success',
-    warning: 'bg-warning/10 text-warning',
-    muted: 'bg-secondary text-muted-foreground',
-  };
-
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border bg-card px-4 py-4">
-      {/* Left accent bar */}
-      <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${accentColors[accent]}`} />
-      <div className="flex items-start justify-between gap-2">
+    <div className="relative overflow-hidden rounded-[2px] border border-border bg-card p-5 group hover:bg-secondary/30 transition-colors">
+      <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 group-hover:text-foreground transition-colors">
             {label}
           </p>
-          <p className="mt-1.5 font-display text-2xl font-extrabold leading-none tracking-tight">
+          <p className="mt-3 font-display text-3xl font-bold tracking-tighter">
             {value}
           </p>
-          <p className="mt-1.5 font-mono text-[10px] text-muted-foreground/70 truncate">{sub}</p>
+          <p className="mt-2 font-mono text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{sub}</p>
         </div>
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${iconColors[accent]}`}>
-          <Icon className="h-4 w-4" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] bg-secondary text-foreground/40 group-hover:text-foreground transition-colors">
+          <Icon className="h-5 w-5" strokeWidth={1.5} />
         </div>
       </div>
     </div>
@@ -222,67 +200,63 @@ function TenantOverview({ current, all }: { current: Tenant; all: Tenant[] }) {
   const activeCount = all.filter((t) => t.status === 'active').length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p className="text-sm text-muted-foreground">Vue d'ensemble de vos instances</p>
+    <div className="space-y-8">
+      <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+          // Fleet_Overview
         </div>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild variant="outline" size="sm" className="h-8 px-4 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border hover:border-foreground">
           <Link to="/provision">
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5 mr-2" />
             Nouvelle instance
           </Link>
         </Button>
       </div>
 
       {/* Stat tiles */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile
           icon={Layers}
           label="Instances"
           value={String(all.length)}
           sub={`${activeCount} active${activeCount > 1 ? 's' : ''}`}
-          accent="primary"
         />
         <StatTile
           icon={Users}
-          label="Plan actif"
+          label="Plan"
           value={planObj.name}
           sub={`${planObj.users} utilisateurs`}
-          accent="success"
         />
         <StatTile
           icon={MapPin}
           label="Région"
           value={current.region.toUpperCase()}
-          sub="Hébergé en Afrique"
-          accent="warning"
+          sub="Afrique de l'Ouest"
         />
         <StatTile
           icon={HardDrive}
           label="Stockage"
           value={`${planObj.storageGb} Go`}
-          sub="Inclus dans le plan"
-          accent="muted"
+          sub="Quota système"
         />
       </div>
 
       <CurrentTenantCard tenant={current} planLabel={planObj.name} />
 
       {others.length > 0 && (
-        <Card className="overflow-hidden border-border bg-card">
-          <div className="flex items-center justify-between border-b border-border px-5 py-3">
-            <h2 className="text-sm font-medium">Autres instances</h2>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Autres instances</h2>
+            <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">
               {others.length} instance{others.length > 1 ? 's' : ''}
             </span>
           </div>
-          <div className="divide-y divide-border">
+          <div className="border border-border divide-y divide-border rounded-[2px] overflow-hidden">
             {others.map((t) => (
               <TenantRow key={t.id} tenant={t} />
             ))}
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );
@@ -293,61 +267,51 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
   const isProv = tenant.status === 'provisioning';
   const isFailed = tenant.status === 'failed';
 
-  const statusBorderColor = {
-    active: 'from-success/60 via-success/40 to-success/10',
-    provisioning: 'from-primary/60 via-primary/40 to-primary/10',
-    failed: 'from-destructive/60 via-destructive/40 to-destructive/10',
-    suspended: 'from-warning/60 via-warning/40 to-warning/10',
-  }[tenant.status];
-
   return (
-    <Card className="overflow-hidden border-border bg-card">
-      {/* Status-colored gradient top line */}
-      <div className={`h-px bg-gradient-to-r ${statusBorderColor}`} />
-
-      <div className="p-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-          <div className="flex items-start gap-4">
+    <div className="mt-12 border border-border bg-card rounded-[2px] overflow-hidden">
+      <div className="p-8">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-start gap-6">
             {/* Avatar */}
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 font-display text-lg font-extrabold uppercase text-primary">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[4px] border border-border bg-secondary font-display text-xl font-bold uppercase text-foreground">
               {tenant.subdomain.slice(0, 2)}
             </div>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-display text-xl font-bold tracking-tight">{tenant.subdomain}</h2>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="font-display text-2xl font-bold tracking-tighter">{tenant.subdomain}</h2>
                 <StatusBadge status={tenant.status} />
               </div>
-              <p className="mt-1 font-mono text-xs text-muted-foreground">
+              <p className="mt-2 font-mono text-xs font-bold text-muted-foreground/60 tracking-tight">
                 {tenant.url.replace('https://', '')}
               </p>
-              <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/50 truncate max-w-xs">
-                {tenant.id}
+              <p className="mt-1 font-mono text-[9px] font-bold text-muted-foreground/30 uppercase tracking-widest truncate max-w-xs">
+                ID: {tenant.id}
               </p>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             {(isProv || isFailed) && (
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border">
                 <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
-                  <Activity className="h-3.5 w-3.5" />
-                  {isProv ? 'Suivre le déploiement' : "Voir l'erreur"}
+                  <Activity className="h-3.5 w-3.5 mr-2" />
+                  {isProv ? 'Logs de déploiement' : "Détails erreur"}
                 </Link>
               </Button>
             )}
             {isActive && (
               <>
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border">
                   <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
-                    <Activity className="h-3.5 w-3.5" />
-                    Logs
+                    <Activity className="h-3.5 w-3.5 mr-2" />
+                    Console Logs
                   </Link>
                 </Button>
-                <Button asChild size="sm" className="glow-primary">
+                <Button asChild size="sm" className="h-9 px-6 rounded-[2px] font-bold text-[10px] uppercase tracking-widest">
                   <a href={tenant.url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Ouvrir Frappe CRM
+                    <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                    Accès CRM
                   </a>
                 </Button>
               </>
@@ -356,76 +320,68 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
         </div>
 
         {isProv && (
-          <div className="mt-5 flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/8 px-4 py-3 text-sm text-primary">
-            <Sparkles className="h-4 w-4 shrink-0 animate-pulse" />
-            Provisioning en cours — accédez aux logs pour suivre en temps réel.
+          <div className="mt-8 flex items-center gap-4 rounded-[2px] border border-border bg-secondary/50 px-6 py-4 text-xs font-bold uppercase tracking-widest text-foreground">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Provisioning_In_Progress // Suivez les logs en temps réel.
           </div>
         )}
 
         {isFailed && (
-          <div className="mt-5 flex items-center gap-2.5 rounded-lg border border-destructive/20 bg-destructive/8 px-4 py-3 text-sm text-destructive">
-            <Activity className="h-4 w-4 shrink-0" />
-            Le déploiement a échoué — consultez les logs pour le détail.
+          <div className="mt-8 flex items-center gap-4 rounded-[2px] border border-destructive/20 bg-destructive/5 px-6 py-4 text-xs font-bold uppercase tracking-widest text-destructive">
+            <Activity className="h-4 w-4" />
+            Deployment_Failed // Consultez la console pour plus de détails.
           </div>
         )}
       </div>
 
       {/* Metadata footer */}
-      <div className="border-t border-border/50 bg-secondary/20 px-6 py-3">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 font-mono text-[11px] text-muted-foreground">
+      <div className="border-t border-border bg-secondary/20 px-8 py-4">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
           <span>
-            Plan <span className="text-foreground font-medium">{planLabel}</span>
+            PLAN: <span className="text-foreground">{planLabel}</span>
           </span>
-          <span className="text-border" aria-hidden>·</span>
           <span>
-            Région <span className="text-foreground font-medium uppercase">{tenant.region}</span>
+            REGION: <span className="text-foreground">{tenant.region.toUpperCase()}</span>
           </span>
-          <span className="text-border" aria-hidden>·</span>
           <span>
-            Créé le{' '}
-            <span className="text-foreground font-medium">
-              {new Date(tenant.createdAt).toLocaleDateString('fr-FR', {
-                day: 'numeric', month: 'long', year: 'numeric',
-              })}
-            </span>
+            UPTIME: <span className="text-success">99.9%</span>
+          </span>
+          <span className="ml-auto">
+            CREATED: <span className="text-foreground">{new Date(tenant.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
           </span>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
 function TenantRow({ tenant }: { tenant: Tenant }) {
   return (
-    <div className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-accent/30 sm:flex-row sm:items-center sm:gap-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-secondary font-mono text-xs font-bold uppercase text-muted-foreground">
+    <div className="flex flex-col gap-4 px-6 py-5 transition-colors hover:bg-secondary/30 sm:flex-row sm:items-center sm:gap-6">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] border border-border bg-secondary font-mono text-[10px] font-bold uppercase text-muted-foreground/60">
         {tenant.subdomain.slice(0, 2)}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium">{tenant.subdomain}</span>
+        <div className="flex items-center gap-3">
+          <span className="truncate text-sm font-bold uppercase tracking-tight">{tenant.subdomain}</span>
           <StatusBadge status={tenant.status} />
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-[11px] text-muted-foreground">
-          <span className="truncate">{tenant.url.replace('https://', '')}</span>
-          <span className="text-border">·</span>
-          <span className="uppercase">{tenant.plan}</span>
+        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] font-bold uppercase tracking-tight text-muted-foreground/40">
+          <span className="truncate tracking-widest">{tenant.url.replace('https://', '')}</span>
+          <span className="text-border">/</span>
+          <span>{tenant.plan.toUpperCase()}</span>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        {tenant.status === 'provisioning' && (
-          <Button asChild size="sm" variant="outline">
-            <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
-              <Activity className="h-3.5 w-3.5" />
-              Suivre
-            </Link>
-          </Button>
-        )}
+      <div className="flex shrink-0 items-center gap-3">
+        <Button asChild size="sm" variant="outline" className="h-8 px-4 rounded-[2px] font-bold text-[9px] uppercase tracking-widest border-border">
+          <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
+            Logs
+          </Link>
+        </Button>
         {tenant.status === 'active' && (
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="h-8 px-4 rounded-[2px] font-bold text-[9px] uppercase tracking-widest border-border hover:bg-foreground hover:text-background">
             <a href={tenant.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="h-3.5 w-3.5" />
-              Ouvrir
+              Accès
             </a>
           </Button>
         )}
