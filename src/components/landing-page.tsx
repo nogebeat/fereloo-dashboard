@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowRight,
   Check,
@@ -17,6 +17,7 @@ import {
   Zap,
   BarChart3,
 } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import {
   Accordion,
@@ -139,8 +140,15 @@ const NAV_LINKS = [
 ];
 
 export function LandingPage() {
-  const { signIn } = useAuth();
+  const { signIn, user, loading } = useAuth();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate({ to: '/dashboard' });
+    }
+  }, [user, loading, navigate]);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">

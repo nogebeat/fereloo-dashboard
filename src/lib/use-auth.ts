@@ -26,7 +26,7 @@ export function useAuth() {
   return {
     user: authUser,
     loading: !isLoaded,
-    signIn: () => openSignIn(),
+    signIn: () => openSignIn({ fallbackRedirectUrl: '/dashboard' }),
     signOut: () => signOut(),
     getToken,
   };
