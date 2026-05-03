@@ -121,8 +121,8 @@ export function LandingPage() {
                 Execute_Deploy <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <div className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider flex flex-col">
-                <span>> No credit card</span>
-                <span>> T_READY: ~90s</span>
+                <span>&gt; No credit card</span>
+                <span>&gt; T_READY: ~90s</span>
               </div>
             </div>
           </div>
@@ -178,14 +178,14 @@ export function LandingPage() {
 
                   <div className="flex-1">
                     <div className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-widest mb-3 border-b border-border pb-2">Limits</div>
-                    <div className="font-mono text-xs text-foreground mb-1">> Users: {p.users}</div>
-                    <div className="font-mono text-xs text-foreground mb-4">> Storage: {p.storageGb}GB</div>
+                    <div className="font-mono text-xs text-foreground mb-1">&gt; Users: {p.users}</div>
+                    <div className="font-mono text-xs text-foreground mb-4">&gt; Storage: {p.storageGb}GB</div>
                     
                     <div className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-widest mb-3 border-b border-border pb-2">Features</div>
                     <ul className="space-y-2 font-mono text-xs text-muted-foreground/80">
                       {p.features.map((f, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <span className="text-primary">></span> <span className="leading-tight">{f}</span>
+                          <span className="text-primary">&gt;</span> <span className="leading-tight">{f}</span>
                         </li>
                       ))}
                     </ul>
