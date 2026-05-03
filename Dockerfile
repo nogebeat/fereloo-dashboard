@@ -1,8 +1,9 @@
-FROM node:20-alpine
+# Utilisation de Node 22 comme requis par TanStack Start
+FROM node:22-alpine
 
 WORKDIR /app
 
-# 1. Installation des dépendances
+# 1. Installation des dépendances (on a besoin des devDeps pour 'vite preview')
 COPY package.json package-lock.json* ./
 RUN npm install
 
@@ -13,21 +14,13 @@ COPY . .
 ENV VITE_API_URL=https://api.fereloo.com
 ENV VITE_CLERK_PUBLISHABLE_KEY=pk_test_bXVzaWNhbC1rb2FsYS00MC5jbGVyay5hY2NvdW50cy5kZXYk
 ENV NODE_ENV=production
-ENV PORT=80
-# Forcer le preset Node Server pour TanStack Start / Nitro
-ENV NITRO_PRESET=node-server
-ENV NITRO_HOST=0.0.0.0
-ENV HOST=0.0.0.0
 
-# Build de l'application TanStack Start
+# Build de l'application
 RUN npm run build
-
-# Debug : On liste les fichiers générés
-RUN ls -R .output/server || ls -R dist/server || echo "Aucun serveur trouvé"
 
 # 3. Exposition du port 80
 EXPOSE 80
 
-# 4. Lancement
-# On priorise .output/server/index.mjs car c'est le standard Nitro pour node-server
-CMD ["sh", "-c", "if [ -f .output/server/index.mjs ]; then node .output/server/index.mjs; elif [ -f dist/server/server.js ]; then node dist/server/server.js; else echo 'ERREUR: Aucun fichier serveur trouvé'; ls -R; exit 1; fi"]
+# 4. Lancement via 'vite preview' qui est le seul mode qui a fonctionné au test local
+# On force le port 80 et l'écoute sur toutes les interfaces
+CMD ["npm", "run", "preview", "--", "--port", "80", "--host", "0.0.0.0"]
