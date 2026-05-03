@@ -10,28 +10,37 @@ RUN npm install
 # Copie du code source
 COPY . .
 
-# Variables au moment du build
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
-ARG VITE_CLERK_PUBLISHABLE_KEY
-ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+# VARIABLES HARDCODÉES POUR LA PRODUCTION
+ENV VITE_API_URL=https://api.fereloo.com
+ENV VITE_CLERK_PUBLISHABLE_KEY=pk_test_bXVzaWNhbC1rb2FsYS00MC5jbGVyay5hY2NvdW50cy5kZXYk
 
-# Build de l'application TanStack Start
+# Lancement du build
 RUN npm run build
 
-# Étape 2 : Runtime Node.js
-FROM node:20-alpine
+# On s'assure que les dossiers existent pour que le COPY ne fasse pas planter Docker
+RUN mkdir -p .output/public dist/client dist
 
-WORKDIR /app
+# Étape 2 : Production avec Nginx
+FROM nginx:stable-alpine
 
-# On récupère uniquement ce qui est nécessaire pour le runtime (.output contient le serveur Nitro)
-COPY --from=build /app/.output ./.output
-COPY --from=build /app/package.json ./package.json
+# Nettoyage
+RUN rm -rf /usr/share/nginx/html/*
 
-# Configuration du serveur
-ENV NODE_ENV=production
-ENV PORT=80
+# Copie flexible (prend ce qui existe)
+COPY --from=build /app/.output/public/ /usr/share/nginx/html/
+COPY --from=build /app/dist/client/ /usr/share/nginx/html/
+COPY --from=build /app/dist/ /usr/share/nginx/html/
+
+# Config Nginx pour SPA
+RUN printf "server { \n\
+    listen 80; \n\
+    location / { \n\
+        root /usr/share/nginx/html; \n\
+        index index.html index.htm; \n\
+        try_files \$uri \$uri/ /index.html; \n\
+    } \n\
+}" > /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 
-# Commande pour lancer le serveur généré par TanStack Start / Nitro
-CMD ["node", ".output/server/index.mjs"]
+CMD ["nginx", "-g", "daemon off;"]
