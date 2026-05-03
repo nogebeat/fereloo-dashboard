@@ -10,6 +10,7 @@ import {
   type PlanId,
   type ProvisioningLog,
   type ProvisioningStep,
+  type ProvisioningStepKey,
   type ProvisioningStepStatus,
   type Tenant,
   type TenantStatusResponse,
@@ -166,7 +167,27 @@ export async function provisionTenant(input: {
 }
 
 export async function deleteTenant(_id: string): Promise<void> {
-  // Not yet exposed by the backend — no-op for now.
+  await apiFetch<{ deleted: boolean }>('/tenants/current', { method: 'DELETE' });
+}
+
+// Maps granular backend step names to frontend high-level step keys.
+const STEP_GROUP: Record<string, ProvisioningStepKey> = {
+  mariadb_create: 'mariadb',
+  mariadb_deploy: 'mariadb',
+  redis_create: 'redis',
+  redis_deploy: 'redis',
+  app_create: 'app',
+  app_update: 'app',
+  app_save_env: 'app',
+  app_deploy: 'app',
+  domain_create: 'domain',
+};
+
+function resolveGroupStatus(statuses: string[]): ProvisioningStepStatus {
+  if (statuses.some((s) => s === 'error')) return 'failed';
+  if (statuses.some((s) => s === 'in_progress')) return 'running';
+  if (statuses.length > 0 && statuses.every((s) => s === 'done')) return 'success';
+  return 'pending';
 }
 
 export async function getTenantStatus(tenantId: string): Promise<TenantStatusResponse | null> {
@@ -178,18 +199,23 @@ export async function getTenantStatus(tenantId: string): Promise<TenantStatusRes
 
     if (!tenant) return null;
 
-    // Build the per-step status by walking all log rows and keeping the last known status.
-    const stepLastStatus = new Map<string, string>();
+    // Group granular backend steps by high-level frontend key.
+    const groupedStatuses = new Map<ProvisioningStepKey, string[]>();
     for (const l of statusData.steps) {
-      stepLastStatus.set(l.step, l.status);
+      const key = STEP_GROUP[l.step];
+      if (key) {
+        const arr = groupedStatuses.get(key) ?? [];
+        arr.push(l.status);
+        groupedStatuses.set(key, arr);
+      }
     }
 
     const steps: ProvisioningStep[] = PROVISIONING_STEP_DEFS.map((def) => ({
       ...def,
-      status: backendStatusToStep(stepLastStatus.get(def.key) ?? 'pending'),
+      status: resolveGroupStatus(groupedStatuses.get(def.key as ProvisioningStepKey) ?? []),
     }));
 
-    // Use every log row as a console entry.
+    // Each backend step row becomes a log entry.
     const logs: ProvisioningLog[] = statusData.steps.map((l, i) => ({
       id: `${tenantId}-${l.step}-${i}`,
       timestamp: l.created_at ?? new Date().toISOString(),

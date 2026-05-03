@@ -180,3 +180,79 @@
 .animate-pulse-glow {
   animation: pulse-glow 1.6s ease-in-out infinite;
 }
+
+/* Gradient text — violet */
+.text-gradient-primary {
+  background-image: linear-gradient(
+    135deg,
+    oklch(0.80 0.18 295) 0%,
+    oklch(0.60 0.25 295) 50%,
+    oklch(0.50 0.22 295) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Subtle grid lines background */
+.bg-grid-lines {
+  background-image:
+    linear-gradient(to right, oklch(0.30 0 0 / 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.30 0 0 / 0.18) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Pipeline connector line — horizontal */
+.pipeline-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    oklch(0.55 0.22 295 / 0.5),
+    oklch(0.55 0.22 295 / 0.1)
+  );
+}
+.pipeline-line-done {
+  background: oklch(0.72 0.17 155 / 0.6);
+}
+.pipeline-line-pending {
+  background: oklch(0.30 0 0);
+}
+
+/* Shimmer animation for loading states */
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.22 0 0) 0%,
+    oklch(0.28 0 0) 50%,
+    oklch(0.22 0 0) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* Progress bar gradient fill */
+.progress-gradient {
+  background: linear-gradient(
+    90deg,
+    oklch(0.55 0.22 295),
+    oklch(0.65 0.20 295)
+  );
+}
+
+/* Animated entrance for sections */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease both;
+}
+.animation-delay-50  { animation-delay: 50ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }

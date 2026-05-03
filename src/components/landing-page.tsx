@@ -29,6 +29,12 @@ import { PLANS } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import dashboardDemo from '@/assets/dashboard-demo.jpg';
 
+const STATS = [
+  { value: '500+', label: 'Entreprises actives' },
+  { value: '12', label: 'Pays en Afrique' },
+  { value: '99,9%', label: 'Disponibilité garantie' },
+];
+
 const BENEFITS = [
   {
     icon: TrendingUp,
@@ -139,18 +145,14 @@ export function LandingPage() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
 
-      {/* Dot grid atmospheric background */}
+      {/* Atmospheric background layers */}
+      <div className="bg-grid-lines pointer-events-none fixed inset-0 z-0 opacity-40" aria-hidden />
+      <div className="bg-dot-grid pointer-events-none fixed inset-0 z-0 opacity-30" aria-hidden />
       <div
-        className="bg-dot-grid pointer-events-none fixed inset-0 z-0 opacity-60"
-        aria-hidden
-      />
-
-      {/* Violet radial glow, top-center */}
-      <div
-        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[480px]"
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[600px]"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.55 0.22 295 / 0.12) 0%, transparent 70%)',
+            'radial-gradient(ellipse 70% 60% at 50% -10%, oklch(0.55 0.22 295 / 0.15) 0%, transparent 70%)',
         }}
         aria-hidden
       />
@@ -158,7 +160,7 @@ export function LandingPage() {
       {/* ── HEADER ── */}
       <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-lg shadow-primary/30">
             <Zap className="h-4 w-4" strokeWidth={2.5} />
           </span>
           <span className="font-display text-lg font-bold tracking-tight">Fereloo</span>
@@ -166,21 +168,31 @@ export function LandingPage() {
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="transition hover:text-foreground">
+            <a
+              key={l.href}
+              href={l.href}
+              className="transition-colors hover:text-foreground"
+            >
               {l.label}
             </a>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href="#commencer"
-            className="hidden rounded-md border border-border bg-card/50 px-3 py-1.5 text-sm text-foreground transition hover:border-primary/40 md:block"
+          <button
+            onClick={() => signIn()}
+            className="hidden rounded-md border border-border bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition hover:border-primary/40 hover:text-foreground md:block"
+          >
+            Se connecter
+          </button>
+          <button
+            onClick={() => signIn()}
+            className="hidden rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 md:block"
           >
             Commencer
-          </a>
+          </button>
           <button
-            className="flex items-center justify-center rounded-md border border-border bg-card/50 p-2 md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card/50 md:hidden"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
@@ -189,7 +201,7 @@ export function LandingPage() {
         </div>
       </header>
 
-      {/* Mobile nav drawer */}
+      {/* Mobile nav */}
       {mobileOpen && (
         <div className="relative z-20 border-b border-border bg-background/96 px-4 pb-4 backdrop-blur md:hidden">
           <nav className="flex flex-col gap-0.5">
@@ -203,54 +215,56 @@ export function LandingPage() {
                 {l.label}
               </a>
             ))}
-            <a
-              href="#commencer"
-              onClick={() => setMobileOpen(false)}
+            <button
+              onClick={() => { setMobileOpen(false); signIn(); }}
               className="mt-2 rounded-md bg-primary px-3 py-2.5 text-center text-sm font-medium text-primary-foreground"
             >
               Commencer gratuitement
-            </a>
+            </button>
           </nav>
         </div>
       )}
 
       {/* ── HERO ── */}
-      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 pt-8 md:px-6 md:pb-16 md:pt-14">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-14 xl:gap-20">
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-10 md:px-6 md:pb-20 md:pt-16">
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-24">
 
           {/* Left: copy */}
           <div className="flex-1 lg:max-w-[52%]">
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 font-mono text-xs uppercase tracking-wider text-primary">
+            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/8 px-3 py-1 font-mono text-xs uppercase tracking-wider text-primary">
               <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-primary" />
               Le CRM des PME africaines
             </div>
 
-            <h1 className="animate-fade-up animation-delay-100 mt-5 font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-[68px]">
+            <h1 className="animate-fade-up animation-delay-100 mt-6 font-display text-[58px] font-extrabold leading-[1.02] tracking-tight md:text-7xl lg:text-[76px]">
               Plus de clients.
               <br />
-              <span className="text-primary">Moins de chaos.</span>
+              <span className="text-gradient-primary">Moins de chaos.</span>
             </h1>
 
-            <p className="animate-fade-up animation-delay-200 mt-5 max-w-lg text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p className="animate-fade-up animation-delay-200 mt-6 max-w-lg text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
               Centralisez vos clients, suivez vos ventes et alignez votre équipe commerciale —
               sans Excel, sans technicien, facturé en FCFA.
             </p>
 
             <div
               id="commencer"
-              className="animate-fade-up animation-delay-300 mt-8 flex max-w-md flex-col gap-2 sm:flex-row"
+              className="animate-fade-up animation-delay-300 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               <Button
                 size="lg"
-                className="h-11 glow-primary shrink-0"
+                className="h-11 glow-primary shrink-0 font-semibold"
                 onClick={() => signIn()}
               >
                 Démarrer gratuitement
                 <ArrowRight className="h-4 w-4" />
               </Button>
+              <span className="text-xs text-muted-foreground sm:pl-1">
+                Aucune carte bancaire requise
+              </span>
             </div>
 
-            <div className="animate-fade-up animation-delay-400 mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+            <div className="animate-fade-up animation-delay-400 mt-5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5 text-success" /> Sans carte bancaire
               </span>
@@ -265,13 +279,13 @@ export function LandingPage() {
 
           {/* Right: dashboard preview */}
           <div className="animate-fade-up animation-delay-200 relative flex-1 lg:max-w-[48%]">
-            {/* Browser chrome frame */}
-            <div className="relative overflow-hidden rounded-xl border border-white/8 shadow-[0_32px_80px_rgba(0,0,0,0.65),0_0_0_1px_rgba(255,255,255,0.05)]">
-              <div className="flex items-center gap-1.5 border-b border-white/8 bg-[oklch(0.20_0_0)] px-3 py-2.5">
+            <div className="relative overflow-hidden rounded-xl border border-white/8 shadow-[0_40px_100px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.04)]">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-1.5 border-b border-white/8 bg-[oklch(0.19_0_0)] px-3 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/70" />
-                <div className="ml-2 flex-1 rounded-md bg-white/5 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+                <div className="ml-2 flex-1 rounded-md bg-white/5 px-3 py-1 font-mono text-[10px] text-muted-foreground/70">
                   app.fereloo.com/dashboard
                 </div>
               </div>
@@ -281,11 +295,16 @@ export function LandingPage() {
                 className="w-full object-cover"
                 loading="lazy"
               />
+              {/* Bottom gradient overlay */}
+              <div
+                className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+                style={{ background: 'linear-gradient(to top, oklch(0.17 0 0 / 0.6), transparent)' }}
+              />
             </div>
 
             {/* Floating stat — bottom left */}
-            <div className="absolute -bottom-3 -left-3 hidden rounded-lg border border-border bg-card/95 px-3.5 py-2.5 shadow-xl backdrop-blur-md md:flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-success/15 text-success">
+            <div className="absolute -bottom-4 -left-4 hidden rounded-xl border border-border bg-card/95 px-4 py-3 shadow-2xl backdrop-blur-md md:flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success/15 text-success">
                 <TrendingUp className="h-4 w-4" />
               </div>
               <div>
@@ -295,8 +314,8 @@ export function LandingPage() {
             </div>
 
             {/* Floating stat — top right */}
-            <div className="absolute -right-3 top-10 hidden rounded-lg border border-border bg-card/95 px-3.5 py-2.5 shadow-xl backdrop-blur-md md:flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 text-primary">
+            <div className="absolute -right-4 top-12 hidden rounded-xl border border-border bg-card/95 px-4 py-3 shadow-2xl backdrop-blur-md md:flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
                 <BarChart3 className="h-4 w-4" />
               </div>
               <div>
@@ -309,10 +328,28 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── STATS ── */}
+      <section className="relative z-10 border-y border-border/40 bg-card/15 py-10 backdrop-blur-sm">
+        <div className="mx-auto max-w-4xl px-4 md:px-6">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            {STATS.map(({ value, label }) => (
+              <div key={label} className="flex flex-col gap-1.5">
+                <span className="font-display text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
+                  {value}
+                </span>
+                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── TRUST BAR ── */}
-      <section className="relative z-10 border-y border-border/50 bg-card/20 py-4 backdrop-blur-sm">
+      <section className="relative z-10 bg-card/10 py-4">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/70">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
             {[
               'Commerce & Retail',
               'Services & Conseil',
@@ -321,10 +358,10 @@ export function LandingPage() {
               'Logistique',
               'Agroalimentaire',
             ].map((sector, i, arr) => (
-              <span key={sector} className="flex items-center gap-7">
+              <span key={sector} className="flex items-center gap-6">
                 <span>{sector}</span>
                 {i < arr.length - 1 && (
-                  <span className="text-border/60" aria-hidden>·</span>
+                  <span className="text-border/50" aria-hidden>·</span>
                 )}
               </span>
             ))}
@@ -335,33 +372,39 @@ export function LandingPage() {
       {/* ── BÉNÉFICES ── */}
       <section
         id="benefices"
-        className="relative z-10 mx-auto max-w-6xl px-4 pb-16 pt-16 md:px-6 md:pb-24"
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-20 md:px-6 md:pb-28"
       >
-        <div className="mb-10">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Pourquoi Fereloo</p>
-          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+        <div className="mb-12 max-w-xl">
+          <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-primary">
+            <span className="h-px w-4 bg-primary" />
+            Pourquoi Fereloo
+          </p>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
             Ce que Fereloo change
-            <br className="hidden md:block" /> pour votre entreprise
+            <br className="hidden md:block" />
+            <span className="text-muted-foreground"> pour votre entreprise</span>
           </h2>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground">
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             Concret, mesurable, dès la première semaine.
           </p>
         </div>
 
-        <div className="grid gap-px border border-border rounded-xl overflow-hidden bg-border md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-px rounded-xl border border-border overflow-hidden bg-border md:grid-cols-2 lg:grid-cols-3">
           {BENEFITS.map((b, i) => (
             <div
               key={b.title}
-              className={cn(
-                'group bg-card p-6 transition hover:bg-accent/30',
-                i === 0 && 'lg:col-span-1',
-              )}
+              className="group relative bg-card p-6 transition-colors hover:bg-accent/20 overflow-hidden"
             >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition group-hover:bg-primary/20">
+              {/* Background number */}
+              <span className="pointer-events-none absolute right-3 top-0 select-none font-display text-[80px] font-extrabold leading-none text-border/20 transition-colors group-hover:text-primary/8">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+
+              <span className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
                 <b.icon className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 font-display text-base font-bold">{b.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.desc}</p>
+              <h3 className="relative mt-4 font-display text-base font-bold">{b.title}</h3>
+              <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">{b.desc}</p>
             </div>
           ))}
         </div>
@@ -370,29 +413,32 @@ export function LandingPage() {
       {/* ── CAS D'USAGE ── */}
       <section
         id="cas-usage"
-        className="relative z-10 mx-auto max-w-6xl px-4 pb-16 md:px-6 md:pb-24"
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-20 md:px-6 md:pb-28"
       >
-        <div className="mb-10">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Secteurs</p>
-          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+        <div className="mb-12">
+          <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-primary">
+            <span className="h-px w-4 bg-primary" />
+            Secteurs
+          </p>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
             Adapté à votre métier
           </h2>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Trois exemples parmi des dizaines de secteurs déjà accompagnés.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {USE_CASES.map((u) => (
             <div
               key={u.title}
-              className="flex flex-col rounded-xl border border-border bg-card/60 p-6 transition hover:border-primary/40"
+              className="group flex flex-col rounded-xl border border-border bg-card/60 p-6 transition-all hover:border-primary/40 hover:bg-card/80"
             >
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
                   <u.icon className="h-5 w-5" />
                 </span>
-                <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   {u.sector}
                 </span>
               </div>
@@ -414,45 +460,57 @@ export function LandingPage() {
       {/* ── TARIFS ── */}
       <section
         id="tarifs"
-        className="relative z-10 mx-auto max-w-6xl px-4 pb-16 md:px-6 md:pb-24"
+        className="relative z-10 mx-auto max-w-6xl px-4 pb-20 md:px-6 md:pb-28"
       >
-        <div className="mb-10 text-center">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">Tarifs</p>
-          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+        <div className="mb-12 text-center">
+          <p className="flex items-center justify-center gap-2 font-mono text-[11px] uppercase tracking-wider text-primary">
+            <span className="h-px w-4 bg-primary" />
+            Tarifs
+            <span className="h-px w-4 bg-primary" />
+          </p>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
             Des tarifs simples, en FCFA
           </h2>
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-muted-foreground">
             Sans engagement. Vous changez de formule quand vous voulez.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {PLANS.map((p) => (
             <div
               key={p.id}
               className={cn(
-                'relative flex flex-col rounded-xl border bg-card/70 p-6 transition',
+                'relative flex flex-col rounded-xl border bg-card/70 p-6 transition-all',
                 p.highlighted
-                  ? 'border-primary glow-primary'
-                  : 'border-border hover:border-primary/40',
+                  ? 'border-primary/60 glow-primary'
+                  : 'border-border hover:border-primary/30',
               )}
             >
               {p.highlighted && (
-                <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
-                  <Sparkles className="h-3 w-3" />
-                  Le plus choisi
-                </span>
+                <>
+                  {/* Top accent strip */}
+                  <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-xl bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
+                  <span className="absolute -top-3.5 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/30">
+                    <Sparkles className="h-3 w-3" />
+                    Le plus choisi
+                  </span>
+                </>
               )}
               <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
                 {p.name}
               </div>
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="font-display text-3xl font-bold tracking-tight">
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="font-display text-4xl font-extrabold tracking-tight">
                   {p.priceFcfa.toLocaleString('fr-FR')}
                 </span>
                 <span className="text-sm text-muted-foreground">FCFA{p.period}</span>
               </div>
-              <ul className="mt-5 flex-1 space-y-2.5 text-sm">
+              <div className="mt-1 font-mono text-[11px] text-muted-foreground/70">
+                {p.users} utilisateurs · {p.storageGb} Go
+              </div>
+              <div className="mt-5 mb-6 h-px bg-border/60" />
+              <ul className="flex-1 space-y-2.5 text-sm">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
@@ -461,11 +519,11 @@ export function LandingPage() {
                 ))}
               </ul>
               <Button
-                asChild
+                onClick={() => signIn()}
                 variant={p.highlighted ? 'default' : 'outline'}
-                className={cn('mt-6', p.highlighted && 'glow-primary')}
+                className={cn('mt-6', p.highlighted && 'glow-primary font-semibold')}
               >
-                <a href="#commencer">Choisir {p.name}</a>
+                Choisir {p.name}
               </Button>
             </div>
           ))}
@@ -475,11 +533,15 @@ export function LandingPage() {
       {/* ── FAQ ── */}
       <section
         id="faq"
-        className="relative z-10 mx-auto max-w-3xl px-4 pb-16 md:px-6 md:pb-24"
+        className="relative z-10 mx-auto max-w-3xl px-4 pb-20 md:px-6 md:pb-28"
       >
-        <div className="mb-10 text-center">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-primary">FAQ</p>
-          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+        <div className="mb-12 text-center">
+          <p className="flex items-center justify-center gap-2 font-mono text-[11px] uppercase tracking-wider text-primary">
+            <span className="h-px w-4 bg-primary" />
+            FAQ
+            <span className="h-px w-4 bg-primary" />
+          </p>
+          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
             Questions fréquentes
           </h2>
         </div>
@@ -506,51 +568,62 @@ export function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section className="relative z-10 mx-auto max-w-4xl px-4 pb-20 md:px-6">
-        <div className="relative overflow-hidden rounded-xl border border-primary/25 bg-card p-8 text-center md:p-12">
-          {/* Subtle radial behind the card */}
+      <section className="relative z-10 mx-auto max-w-5xl px-4 pb-24 md:px-6">
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-card p-10 text-center md:p-16">
+          {/* Layered background glows */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'radial-gradient(ellipse 60% 80% at 50% 100%, oklch(0.55 0.22 295 / 0.08) 0%, transparent 70%)',
+                'radial-gradient(ellipse 80% 80% at 50% 120%, oklch(0.55 0.22 295 / 0.12) 0%, transparent 60%)',
             }}
             aria-hidden
           />
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background: 'linear-gradient(90deg, transparent, oklch(0.55 0.22 295 / 0.4), transparent)',
+            }}
+            aria-hidden
+          />
+
           <p className="relative font-mono text-[11px] uppercase tracking-wider text-primary">
             Prêt à structurer votre commercial ?
           </p>
-          <h2 className="relative mt-3 font-display text-2xl font-bold tracking-tight md:text-3xl">
+          <h2 className="relative mt-4 font-display text-3xl font-bold tracking-tight md:text-4xl">
             Rejoignez les PME africaines
-            <br className="hidden md:block" /> qui ont arrêté de perdre leurs clients dans Excel.
+            <br className="hidden md:block" />
+            <span className="text-muted-foreground text-2xl md:text-3xl"> qui ont arrêté de perdre leurs clients dans Excel.</span>
           </h2>
-          <p className="relative mx-auto mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
+          <p className="relative mx-auto mt-4 max-w-xl text-sm text-muted-foreground md:text-base">
             Configuration en quelques minutes. Aucune carte bancaire requise.
           </p>
-          <Button asChild size="lg" className="relative mt-6 h-11 glow-primary">
-            <a href="#commencer">
-              Démarrer gratuitement
-              <ArrowRight className="h-4 w-4" />
-            </a>
+          <Button
+            size="lg"
+            className="relative mt-8 h-12 glow-primary font-semibold"
+            onClick={() => signIn()}
+          >
+            Démarrer gratuitement
+            <ArrowRight className="h-4 w-4" />
           </Button>
-          <p className="relative mt-3 text-xs text-muted-foreground">
+          <p className="relative mt-4 text-xs text-muted-foreground">
             Sans carte bancaire · Sans engagement · Made in Africa
           </p>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="relative z-10 border-t border-border/60">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground md:flex-row md:px-6">
-          <div className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-primary-foreground">
+      <footer className="relative z-10 border-t border-border/40">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-xs text-muted-foreground md:flex-row md:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-primary-foreground shadow-sm">
               <Zap className="h-3 w-3" strokeWidth={2.5} />
             </span>
-            <span className="font-display font-bold">Fereloo</span>
+            <span className="font-display font-bold text-foreground">Fereloo</span>
             <span className="text-border/60">·</span>
             <span>© {new Date().getFullYear()} · Made in Africa</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <a href="#" className="transition hover:text-foreground">Confidentialité</a>
             <a href="#" className="transition hover:text-foreground">Conditions</a>
             <a href="mailto:hello@fereloo.com" className="transition hover:text-foreground">Contact</a>
