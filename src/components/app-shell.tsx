@@ -29,13 +29,13 @@ function Breadcrumbs() {
   const path = router.location.pathname;
 
   const crumbs: Array<{ label: string; href?: string }> = [
-    { label: 'CONSOLE', href: '/dashboard' },
+    { label: 'ACCUEIL', href: '/dashboard' },
   ];
 
   if (path === '/provision') {
-    crumbs.push({ label: 'PROVISIONING' });
+    crumbs.push({ label: 'INSTALLATION' });
   } else if (path.startsWith('/status/')) {
-    crumbs.push({ label: 'STATUS' });
+    crumbs.push({ label: 'STATUT' });
   }
 
   if (crumbs.length <= 1) return null;
@@ -131,4 +131,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

@@ -112,11 +112,11 @@ export function LandingPage() {
                 Démarrer l'essai gratuit <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <div className="text-[11px] font-bold text-muted-foreground uppercase leading-tight tracking-wider">
-                &gt; Prêt en 90 secondes<br/>
-                &gt; Aucune carte requise
-              </div>
+              ✓ Prêt en 90 secondes<br/>
+              ✓ Aucune carte requise
             </div>
           </div>
+        </div>
           
           <div className="relative hidden lg:block">
              <div className="absolute -inset-4 bg-secondary/50 rounded-2xl -z-10 blur-2xl opacity-50" />

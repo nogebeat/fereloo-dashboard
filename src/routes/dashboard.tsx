@@ -14,6 +14,7 @@ import {
   HardDrive,
   MapPin,
   Layers,
+  ArrowRight,
 } from 'lucide-react';
 import { getCurrentTenant, listTenants } from '@/lib/api';
 import { useAuth } from '@/lib/use-auth';
@@ -73,11 +74,11 @@ function DashboardPage() {
     <AppShell>
       {/* Greeting */}
       <div className="mb-12">
-        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-2">
-          // Session_Active
+        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
+          Session active
         </div>
         <h1 className="font-display text-3xl font-bold tracking-tighter md:text-4xl">
-          Console. <span className="text-muted-foreground/40">{user.name.split(' ')[0]}</span>
+          Tableau de bord. <span className="text-muted-foreground/40">{user.name.split(' ')[0]}</span>
         </h1>
       </div>
 
@@ -113,23 +114,23 @@ function NoTenantState() {
         <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-[4px] border border-border bg-secondary text-foreground">
           <Rocket className="h-7 w-7" />
         </div>
-        <div className="inline-flex items-center gap-2 rounded-none border border-border bg-secondary/50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          &gt; Bienvenue sur Fereloo
+        <div className="inline-flex items-center gap-2 rounded-none border border-border bg-secondary/50 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          Bienvenue sur Fereloo
         </div>
         <h2 className="mt-6 font-display text-3xl font-bold tracking-tighter">
-          Provisionnez votre instance.
+          Prêt à démarrer ?
         </h2>
         <p className="mt-4 text-balance text-sm leading-relaxed text-muted-foreground font-medium">
-          Aucune instance active détectée. Déployez votre environnement Frappe CRM en moins de 90 secondes.
+          Vous n'avez pas encore d'instance active. Déployez votre environnement de gestion en moins de 2 minutes.
         </p>
       </div>
 
       {/* Infrastructure overview */}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { icon: Database, label: 'MariaDB', desc: 'Isolé' },
-          { icon: Server, label: 'Redis', desc: 'Dédié' },
-          { icon: Globe, label: 'TLS auto', desc: 'SSL' },
+          { icon: Database, label: 'Base de données', desc: 'Isolée' },
+          { icon: Server, label: 'Serveur Cache', desc: 'Dédié' },
+          { icon: Globe, label: 'Certificat SSL', desc: 'Sécurisé' },
         ].map(({ icon: Icon, label, desc }) => (
           <div
             key={label}
@@ -140,7 +141,7 @@ function NoTenantState() {
             </div>
             <div>
               <div className="text-[11px] font-bold uppercase tracking-tight">{label}</div>
-              <div className="font-mono text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">{desc}</div>
+              <div className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">{desc}</div>
             </div>
           </div>
         ))}
@@ -148,14 +149,14 @@ function NoTenantState() {
 
       <div className="border border-foreground/10 bg-card p-8 rounded-[4px] flex flex-col items-center justify-center gap-6 text-center">
         <div>
-          <h3 className="font-display text-lg font-bold">Prêt pour le déploiement ?</h3>
+          <h3 className="font-display text-lg font-bold">Lancer le déploiement</h3>
           <p className="mt-2 text-sm text-muted-foreground font-medium">
-            Choisissez votre sous-domaine et lancez l'orchestration.
+            Choisissez votre nom de domaine et lancez l'installation automatique.
           </p>
         </div>
         <Button asChild className="h-12 px-8 rounded-[2px] font-bold text-xs uppercase tracking-widest">
           <Link to="/provision">
-            Lancer l'orchestration <ArrowRight className="ml-2 h-4 w-4" />
+            Démarrer maintenant <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       </div>
@@ -178,13 +179,13 @@ function StatTile({
     <div className="relative overflow-hidden rounded-[2px] border border-border bg-card p-5 group hover:bg-secondary/30 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 group-hover:text-foreground transition-colors">
+          <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/60 group-hover:text-foreground transition-colors">
             {label}
           </p>
           <p className="mt-3 font-display text-3xl font-bold tracking-tighter">
             {value}
           </p>
-          <p className="mt-2 font-mono text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{sub}</p>
+          <p className="mt-2 text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest truncate">{sub}</p>
         </div>
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] bg-secondary text-foreground/40 group-hover:text-foreground transition-colors">
           <Icon className="h-5 w-5" strokeWidth={1.5} />
@@ -202,8 +203,8 @@ function TenantOverview({ current, all }: { current: Tenant; all: Tenant[] }) {
   return (
     <div className="space-y-8">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
-          // Fleet_Overview
+        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          Vue d'ensemble
         </div>
         <Button asChild variant="outline" size="sm" className="h-8 px-4 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border hover:border-foreground">
           <Link to="/provision">
@@ -281,11 +282,11 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
                 <h2 className="font-display text-2xl font-bold tracking-tighter">{tenant.subdomain}</h2>
                 <StatusBadge status={tenant.status} />
               </div>
-              <p className="mt-2 font-mono text-xs font-bold text-muted-foreground/60 tracking-tight">
+              <p className="mt-2 text-xs font-bold text-muted-foreground/60 tracking-tight">
                 {tenant.url.replace('https://', '')}
               </p>
-              <p className="mt-1 font-mono text-[9px] font-bold text-muted-foreground/30 uppercase tracking-widest truncate max-w-xs">
-                ID: {tenant.id}
+              <p className="mt-1 text-[9px] font-bold text-muted-foreground/30 uppercase tracking-widest truncate max-w-xs">
+                Identifiant : {tenant.id}
               </p>
             </div>
           </div>
@@ -296,7 +297,7 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
               <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border">
                 <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
                   <Activity className="h-3.5 w-3.5 mr-2" />
-                  {isProv ? 'Logs de déploiement' : "Détails erreur"}
+                  {isProv ? 'Suivre l\'installation' : "Détails erreur"}
                 </Link>
               </Button>
             )}
@@ -305,13 +306,13 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
                 <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border">
                   <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
                     <Activity className="h-3.5 w-3.5 mr-2" />
-                    Console Logs
+                    Statistiques
                   </Link>
                 </Button>
                 <Button asChild size="sm" className="h-9 px-6 rounded-[2px] font-bold text-[10px] uppercase tracking-widest">
                   <a href={tenant.url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-3.5 w-3.5 mr-2" />
-                    Accès CRM
+                    Ouvrir le CRM
                   </a>
                 </Button>
               </>
@@ -322,32 +323,32 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
         {isProv && (
           <div className="mt-8 flex items-center gap-4 rounded-[2px] border border-border bg-secondary/50 px-6 py-4 text-xs font-bold uppercase tracking-widest text-foreground">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Provisioning_In_Progress // Suivez les logs en temps réel.
+            Installation en cours. Suivez l'avancement en temps réel.
           </div>
         )}
 
         {isFailed && (
           <div className="mt-8 flex items-center gap-4 rounded-[2px] border border-destructive/20 bg-destructive/5 px-6 py-4 text-xs font-bold uppercase tracking-widest text-destructive">
             <Activity className="h-4 w-4" />
-            Deployment_Failed // Consultez la console pour plus de détails.
+            Échec du déploiement. Veuillez consulter les logs pour plus de détails.
           </div>
         )}
       </div>
 
       {/* Metadata footer */}
       <div className="border-t border-border bg-secondary/20 px-8 py-4">
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
           <span>
-            PLAN: <span className="text-foreground">{planLabel}</span>
+            PLAN : <span className="text-foreground">{planLabel}</span>
           </span>
           <span>
-            REGION: <span className="text-foreground">{tenant.region.toUpperCase()}</span>
+            RÉGION : <span className="text-foreground">{tenant.region.toUpperCase()}</span>
           </span>
           <span>
-            UPTIME: <span className="text-success">99.9%</span>
+            DISPONIBILITÉ : <span className="text-success">99.9%</span>
           </span>
           <span className="ml-auto">
-            CREATED: <span className="text-foreground">{new Date(tenant.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+            CRÉÉ LE : <span className="text-foreground">{new Date(tenant.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
           </span>
         </div>
       </div>
