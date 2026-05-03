@@ -101,8 +101,8 @@ export function LandingPage() {
               Exécuter le déploiement <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <div className="font-mono text-[10px] text-muted-foreground uppercase leading-tight">
-              > Aucun frais caché<br/>
-              > Prêt en 90 secondes
+              &gt; Aucun frais caché<br/>
+              &gt; Prêt en 90 secondes
             </div>
           </div>
         </div>
