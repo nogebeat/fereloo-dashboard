@@ -176,6 +176,9 @@ export default defineConfig(({ command, mode }) => {
       host: "::",
       port: 8080,
     },
+    preview: {
+      allowedHosts: ["fereloo.com", "api.fereloo.com"],
+    },
     define: envDefine,
     resolve: {
       alias: {
