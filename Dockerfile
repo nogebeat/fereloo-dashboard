@@ -17,8 +17,8 @@ ENV VITE_CLERK_PUBLISHABLE_KEY=pk_test_bXVzaWNhbC1rb2FsYS00MC5jbGVyay5hY2NvdW50c
 # Lancement du build
 RUN npm run build
 
-# On s'assure que les dossiers existent pour que le COPY ne fasse pas planter Docker
-RUN mkdir -p .output/public dist/client dist
+# CETTE LIGNE VA NOUS DIRE DANS LES LOGS DOKPLOY OÙ SONT LES FICHIERS
+RUN find . -name "index.html"
 
 # Étape 2 : Production avec Nginx
 FROM nginx:stable-alpine
@@ -27,9 +27,17 @@ FROM nginx:stable-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copie flexible (prend ce qui existe)
-COPY --from=build /app/.output/public/ /usr/share/nginx/html/
-COPY --from=build /app/dist/client/ /usr/share/nginx/html/
-COPY --from=build /app/dist/ /usr/share/nginx/html/
+# On crée les dossiers sources pour éviter les erreurs si certains manquent
+RUN mkdir -p /tmp/empty
+COPY --from=build /app/.output/public/ /usr/share/nginx/html/ || true
+COPY --from=build /app/dist/client/ /usr/share/nginx/html/ || true
+COPY --from=build /app/dist/ /usr/share/nginx/html/ || true
+
+# Sécurité : si le dossier est toujours vide, Nginx donnera un 403.
+# On vérifie s'il y a un index.html, sinon on crée un fichier de test explicite
+RUN if [ ! -f /usr/share/nginx/html/index.html ]; then \
+    echo "L'application n'a pas été copiée au bon endroit. Vérifiez les logs de build pour trouver le chemin de index.html" > /usr/share/nginx/html/index.html; \
+    fi
 
 # Config Nginx pour SPA
 RUN printf "server { \n\
