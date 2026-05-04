@@ -13,6 +13,7 @@ import {
   Box,
   Globe,
   RefreshCw,
+  Activity,
 } from 'lucide-react';
 import { AppShell } from '@/components/app-shell';
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import {
   Plus,
   ExternalLink,
@@ -15,13 +15,13 @@ import {
   MapPin,
   Layers,
   ArrowRight,
+  Trash2,
 } from 'lucide-react';
-import { getCurrentTenant, listTenants } from '@/lib/api';
+import { getCurrentTenant, listTenants, deleteTenant } from '@/lib/api';
 import { useAuth } from '@/lib/use-auth';
 import { AppShell } from '@/components/app-shell';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLANS, type Tenant } from '@/lib/types';
 
@@ -267,6 +267,24 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
   const isActive = tenant.status === 'active';
   const isProv = tenant.status === 'provisioning';
   const isFailed = tenant.status === 'failed';
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteTenant(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['current-tenant'] });
+    },
+    onSettled: () => setIsDeleting(false),
+  });
+
+  const handleDelete = () => {
+    if (window.confirm("Voulez-vous vraiment supprimer cette instance ? Toutes les données seront perdues.")) {
+      setIsDeleting(true);
+      deleteMutation.mutate(tenant.id);
+    }
+  };
 
   return (
     <div className="mt-12 border border-border bg-card rounded-[2px] overflow-hidden">
@@ -282,7 +300,7 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
                 <h2 className="font-display text-2xl font-bold tracking-tighter">{tenant.subdomain}</h2>
                 <StatusBadge status={tenant.status} />
               </div>
-              <p className="mt-2 text-xs font-bold text-muted-foreground/60 tracking-tight">
+              <p className="mt-2 font-mono text-xs font-bold text-muted-foreground/60 tracking-tight">
                 {tenant.url.replace('https://', '')}
               </p>
               <p className="mt-1 text-[9px] font-bold text-muted-foreground/30 uppercase tracking-widest truncate max-w-xs">
@@ -293,6 +311,17 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="h-9 w-9 p-0 rounded-[2px] border-border hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30"
+              title="Supprimer l'instance"
+            >
+              {isDeleting ? <Activity className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+            </Button>
+
             {(isProv || isFailed) && (
               <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-[2px] font-bold text-[10px] uppercase tracking-widest border-border">
                 <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
@@ -357,6 +386,25 @@ function CurrentTenantCard({ tenant, planLabel }: { tenant: Tenant; planLabel: s
 }
 
 function TenantRow({ tenant }: { tenant: Tenant }) {
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteTenant(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['current-tenant'] });
+    },
+    onSettled: () => setIsDeleting(false),
+  });
+
+  const handleDelete = () => {
+    if (window.confirm("Voulez-vous vraiment supprimer cette instance ?")) {
+      setIsDeleting(true);
+      deleteMutation.mutate(tenant.id);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 px-6 py-5 transition-colors hover:bg-secondary/30 sm:flex-row sm:items-center sm:gap-6">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[2px] border border-border bg-secondary font-mono text-[10px] font-bold uppercase text-muted-foreground/60">
@@ -374,6 +422,15 @@ function TenantRow({ tenant }: { tenant: Tenant }) {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-3">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="h-8 w-8 p-0 rounded-[2px] border-border hover:bg-destructive/5 hover:text-destructive"
+        >
+          {isDeleting ? <Activity className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+        </Button>
         <Button asChild size="sm" variant="outline" className="h-8 px-4 rounded-[2px] font-bold text-[9px] uppercase tracking-widest border-border">
           <Link to="/status/$tenantId" params={{ tenantId: tenant.id }}>
             Logs

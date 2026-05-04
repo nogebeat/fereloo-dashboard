@@ -166,8 +166,8 @@ export async function provisionTenant(input: {
   };
 }
 
-export async function deleteTenant(_id: string): Promise<void> {
-  await apiFetch<{ deleted: boolean }>('/tenants/current', { method: 'DELETE' });
+export async function deleteTenant(id: string): Promise<void> {
+  await apiFetch<{ deleted: boolean }>(`/tenants/${id}`, { method: 'DELETE' });
 }
 
 // Maps granular backend step names to frontend high-level step keys.
@@ -180,6 +180,7 @@ const STEP_GROUP: Record<string, ProvisioningStepKey> = {
   app_update: 'app',
   app_save_env: 'app',
   app_deploy: 'app',
+  app_booting: 'booting',
   domain_create: 'domain',
 };
 
