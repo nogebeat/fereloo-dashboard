@@ -19,8 +19,11 @@ import {
 } from 'lucide-react';
 import { getCurrentTenant, listTenants, deleteTenant } from '@/lib/api';
 import { useAuth } from '@/lib/use-auth';
+import { useOnboarding } from '@/lib/use-onboarding';
 import { AppShell } from '@/components/app-shell';
 import { StatusBadge } from '@/components/status-badge';
+import { OnboardingModal } from '@/components/onboarding-modal';
+import { OnboardingChecklist } from '@/components/onboarding-checklist';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLANS, type Tenant } from '@/lib/types';
@@ -41,6 +44,7 @@ export const Route = createFileRoute('/dashboard')({
 function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { companyInfo, checklistDismissed, saveCompanyInfo, dismissChecklist } = useOnboarding(user?.id);
 
   useEffect(() => {
     if (!loading && !user) router.navigate({ to: '/' });
@@ -72,6 +76,12 @@ function DashboardPage() {
 
   return (
     <AppShell>
+      <OnboardingModal
+        open={!companyInfo}
+        userName={user.name}
+        onComplete={saveCompanyInfo}
+      />
+
       {/* Greeting */}
       <div className="mb-12">
         <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
@@ -81,6 +91,14 @@ function DashboardPage() {
           Tableau de bord. <span className="text-muted-foreground/40">{user.name.split(' ')[0]}</span>
         </h1>
       </div>
+
+      {!checklistDismissed && !isLoading && (
+        <OnboardingChecklist
+          companyDone={!!companyInfo}
+          tenants={tenants ?? []}
+          onDismiss={dismissChecklist}
+        />
+      )}
 
       {isLoading ? (
         <DashboardSkeleton />
